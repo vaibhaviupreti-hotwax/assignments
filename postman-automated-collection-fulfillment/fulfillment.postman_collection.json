@@ -1,0 +1,678 @@
+{
+	"info": {
+		"_postman_id": "e7dd0cff-df1d-4bc1-9202-72846ce92abb",
+		"name": "My Collection",
+		"description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "54558812",
+		"_collection_link": "https://vaibhavi-upreti-1432750.postman.co/workspace/69e0e4c3-1c6a-4382-8bd4-37d8186dcedb/collection/54558812-e7dd0cff-df1d-4bc1-9202-72846ce92abb?action=share&source=collection_link&creator=54558812"
+	},
+	"item": [
+		{
+			"name": "shipment",
+			"item": [
+				{
+					"name": "solr-query",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{shipment-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://nextgen-oms.hotwax.io/api/solr-query?json={\"filter\":\"docType: ORDER AND ...\",\"query\":\"(*:*)\",\"params\":{\"rows\":\"10\",\"sort\":\"orderDate asc\",...}}",
+							"protocol": "https",
+							"host": [
+								"nextgen-oms",
+								"hotwax",
+								"io"
+							],
+							"path": [
+								"api",
+								"solr-query"
+							],
+							"query": [
+								{
+									"key": "json",
+									"value": "{\"filter\":\"docType: ORDER AND ...\",\"query\":\"(*:*)\",\"params\":{\"rows\":\"10\",\"sort\":\"orderDate asc\",...}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "solr-query Copy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{shipment-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"filter\": \"docType: ORDER AND -shipmentMethodTypeId: (STOREPICKUP OR POS_COMPLETED) AND orderStatusId: ORDER_APPROVED AND orderTypeId: SALES_ORDER AND productStoreId: STORE AND facilityId: MAPLEWOOD AND ((*:* -fulfillmentStatus: [* TO *]) OR fulfillmentStatus:Created) AND entryDate:[2025-01-01T00:00:00Z TO *]\",\n  \"query\": \"(*:*)\",\n  \"params\": {\n    \"rows\": \"10\",\n    \"sort\": \"orderDate asc\",\n    \"q.op\": \"AND\",\n    \"start\": 0,\n    \"group\": true,\n    \"group.field\": \"orderItemShipGroupIdentifier\",\n    \"group.limit\": 1000,\n    \"group.ngroups\": true\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://nextgen-oms.hotwax.io/api/solr-query?json={\"filter\":\"docType: ORDER AND ...\",\"query\":\"(*:*)\",\"params\":{\"rows\":\"10\",\"sort\":\"orderDate asc\",...}}",
+							"protocol": "https",
+							"host": [
+								"nextgen-oms",
+								"hotwax",
+								"io"
+							],
+							"path": [
+								"api",
+								"solr-query"
+							],
+							"query": [
+								{
+									"key": "json",
+									"value": "{\"filter\":\"docType: ORDER AND ...\",\"query\":\"(*:*)\",\"params\":{\"rows\":\"10\",\"sort\":\"orderDate asc\",...}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "shipmentMethodTypes",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{shipment-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://nextgen-maarg.hotwax.io/rest/s1/oms/shippingGateways/shipmentMethodTypes?shipmentMethodTypeId=STANDARD&shipmentMethodTypeId_op=in&fieldsToSelect=shipmentMethodTypeId&fieldsToSelect=description&pageSize=1",
+							"protocol": "https",
+							"host": [
+								"nextgen-maarg",
+								"hotwax",
+								"io"
+							],
+							"path": [
+								"rest",
+								"s1",
+								"oms",
+								"shippingGateways",
+								"shipmentMethodTypes"
+							],
+							"query": [
+								{
+									"key": "shipmentMethodTypeId",
+									"value": "STANDARD"
+								},
+								{
+									"key": "shipmentMethodTypeId_op",
+									"value": "in"
+								},
+								{
+									"key": "fieldsToSelect",
+									"value": "shipmentMethodTypeId"
+								},
+								{
+									"key": "fieldsToSelect",
+									"value": "description"
+								},
+								{
+									"key": "pageSize",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createOrderFulfillmentWave",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{shipment-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"packageName\": \"A\",\n  \"facilityId\": \"MAPLEWOOD\",\n  \"shipmentMethodTypeId\": \"STANDARD\",\n  \"statusId\": \"PICKLIST_ASSIGNED\",\n  \"pickers\": [\n    {\n      \"partyId\": \"10043\",\n      \"roleTypeId\": \"WAREHOUSE_PICKER\"\n    }\n  ],\n  \"orderItems\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://nextgen-maarg.hotwax.io/rest/s1/poorti/createOrderFulfillmentWave",
+							"protocol": "https",
+							"host": [
+								"nextgen-maarg",
+								"hotwax",
+								"io"
+							],
+							"path": [
+								"rest",
+								"s1",
+								"poorti",
+								"createOrderFulfillmentWave"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://nextgen-maarg.hotwax.io/fop/apps/pdf/PrintPicklist?picklistId=M100325",
+							"protocol": "https",
+							"host": [
+								"nextgen-maarg",
+								"hotwax",
+								"io"
+							],
+							"path": [
+								"fop",
+								"apps",
+								"pdf",
+								"PrintPicklist"
+							],
+							"query": [
+								{
+									"key": "picklistId",
+									"value": "M100325"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "shipmentPicklists",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://nextgen-maarg.hotwax.io/rest/s1/poorti/shipmentPicklists?originFacilityId=MAPLEWOOD&statusId=SHIPMENT_APPROVED&shipmentMethodTypeId=STOREPICKUP&shipmentMethodTypeId_op=equals&shipmentMethodTypeId_not=Y&pageIndex=0&pageSize=50",
+							"protocol": "https",
+							"host": [
+								"nextgen-maarg",
+								"hotwax",
+								"io"
+							],
+							"path": [
+								"rest",
+								"s1",
+								"poorti",
+								"shipmentPicklists"
+							],
+							"query": [
+								{
+									"key": "originFacilityId",
+									"value": "MAPLEWOOD"
+								},
+								{
+									"key": "statusId",
+									"value": "SHIPMENT_APPROVED"
+								},
+								{
+									"key": "shipmentMethodTypeId",
+									"value": "STOREPICKUP"
+								},
+								{
+									"key": "shipmentMethodTypeId_op",
+									"value": "equals"
+								},
+								{
+									"key": "shipmentMethodTypeId_not",
+									"value": "Y"
+								},
+								{
+									"key": "pageIndex",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "50"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "enums",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://nextgen-maarg.hotwax.io/rest/s1/admin/enums?parentTypeId=REPORT_AN_ISSUE&parentTypeId=RPRT_NO_VAR_LOG&parentTypeId_op=in&pageSize=20&orderByField=sequenceNum",
+							"protocol": "https",
+							"host": [
+								"nextgen-maarg",
+								"hotwax",
+								"io"
+							],
+							"path": [
+								"rest",
+								"s1",
+								"admin",
+								"enums"
+							],
+							"query": [
+								{
+									"key": "parentTypeId",
+									"value": "REPORT_AN_ISSUE"
+								},
+								{
+									"key": "parentTypeId",
+									"value": "RPRT_NO_VAR_LOG"
+								},
+								{
+									"key": "parentTypeId_op",
+									"value": "in"
+								},
+								{
+									"key": "pageSize",
+									"value": "20"
+								},
+								{
+									"key": "orderByField",
+									"value": "sequenceNum"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://nextgen-maarg.hotwax.io/rest/s1/poorti/shipments?pageSize=10&orderBy=orderDate&shipmentTypeId=SALES_SHIPMENT&productStoreId=STORE&originFacilityId=MAPLEWOOD&orderStatusId=ORDER_APPROVED&statusId=SHIPMENT_APPROVED",
+							"protocol": "https",
+							"host": [
+								"nextgen-maarg",
+								"hotwax",
+								"io"
+							],
+							"path": [
+								"rest",
+								"s1",
+								"poorti",
+								"shipments"
+							],
+							"query": [
+								{
+									"key": "pageSize",
+									"value": "10"
+								},
+								{
+									"key": "orderBy",
+									"value": "orderDate"
+								},
+								{
+									"key": "shipmentTypeId",
+									"value": "SALES_SHIPMENT"
+								},
+								{
+									"key": "productStoreId",
+									"value": "STORE"
+								},
+								{
+									"key": "originFacilityId",
+									"value": "MAPLEWOOD"
+								},
+								{
+									"key": "orderStatusId",
+									"value": "ORDER_APPROVED"
+								},
+								{
+									"key": "statusId",
+									"value": "SHIPMENT_APPROVED"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "shipmentPackages",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://nextgen-maarg.hotwax.io/rest/s1/poorti/shipments/M100363/shipmentPackages",
+							"protocol": "https",
+							"host": [
+								"nextgen-maarg",
+								"hotwax",
+								"io"
+							],
+							"path": [
+								"rest",
+								"s1",
+								"poorti",
+								"shipments",
+								"M100363",
+								"shipmentPackages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "pack",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"facilityId\": \"MAPLEWOOD\",\n  \"orderId\": \"171\",\n  \"rejectedOrderItems\": [],\n  \"shipmentId\": \"M100363\",\n  \"shipmentPackageContents\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://nextgen-maarg.hotwax.io/rest/s1/poorti/shipments/M100363/pack",
+							"protocol": "https",
+							"host": [
+								"nextgen-maarg",
+								"hotwax",
+								"io"
+							],
+							"path": [
+								"rest",
+								"s1",
+								"poorti",
+								"shipments",
+								"M100363",
+								"pack"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "shipmentPackageRouteSegDetails",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://nextgen-maarg.hotwax.io/rest/s1/poorti/shipmentPackageRouteSegDetails?shipmentId=M100363&pageSize=10",
+							"protocol": "https",
+							"host": [
+								"nextgen-maarg",
+								"hotwax",
+								"io"
+							],
+							"path": [
+								"rest",
+								"s1",
+								"poorti",
+								"shipmentPackageRouteSegDetails"
+							],
+							"query": [
+								{
+									"key": "shipmentId",
+									"value": "M100363"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "shipmentPicklists",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://nextgen-maarg.hotwax.io/rest/s1/poorti/shipmentPicklists?originFacilityId=MAPLEWOOD&statusId=SHIPMENT_APPROVED&shipmentMethodTypeId=STOREPICKUP&shipmentMethodTypeId_op=equals&shipmentMethodTypeId_not=Y&pageIndex=0&pageSize=50",
+							"protocol": "https",
+							"host": [
+								"nextgen-maarg",
+								"hotwax",
+								"io"
+							],
+							"path": [
+								"rest",
+								"s1",
+								"poorti",
+								"shipmentPicklists"
+							],
+							"query": [
+								{
+									"key": "originFacilityId",
+									"value": "MAPLEWOOD"
+								},
+								{
+									"key": "statusId",
+									"value": "SHIPMENT_APPROVED"
+								},
+								{
+									"key": "shipmentMethodTypeId",
+									"value": "STOREPICKUP"
+								},
+								{
+									"key": "shipmentMethodTypeId_op",
+									"value": "equals"
+								},
+								{
+									"key": "shipmentMethodTypeId_not",
+									"value": "Y"
+								},
+								{
+									"key": "pageIndex",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "50"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "unpack",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"shipmentId\":\"M100363\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://nextgen-maarg.hotwax.io/rest/s1/poorti/shipments/M100363/unpack",
+							"protocol": "https",
+							"host": [
+								"nextgen-maarg",
+								"hotwax",
+								"io"
+							],
+							"path": [
+								"rest",
+								"s1",
+								"poorti",
+								"shipments",
+								"M100363",
+								"unpack"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "shipmentFacets",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{shipment-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://nextgen-maarg.hotwax.io/rest/s1/poorti/shipmentFacets?orderTypeId=SALES_ORDER&statusId=SHIPMENT_PACKED&shippedDateFrom=1781548200000&originFacilityId=MAPLEWOOD&productStoreId=STORE",
+							"protocol": "https",
+							"host": [
+								"nextgen-maarg",
+								"hotwax",
+								"io"
+							],
+							"path": [
+								"rest",
+								"s1",
+								"poorti",
+								"shipmentFacets"
+							],
+							"query": [
+								{
+									"key": "orderTypeId",
+									"value": "SALES_ORDER"
+								},
+								{
+									"key": "statusId",
+									"value": "SHIPMENT_PACKED"
+								},
+								{
+									"key": "shippedDateFrom",
+									"value": "1781548200000"
+								},
+								{
+									"key": "originFacilityId",
+									"value": "MAPLEWOOD"
+								},
+								{
+									"key": "productStoreId",
+									"value": "STORE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ship",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"shipmentId\":\"M100363\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://nextgen-maarg.hotwax.io/rest/s1/poorti/shipments/M100363/ship",
+							"protocol": "https",
+							"host": [
+								"nextgen-maarg",
+								"hotwax",
+								"io"
+							],
+							"path": [
+								"rest",
+								"s1",
+								"poorti",
+								"shipments",
+								"M100363",
+								"ship"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "shipment-token",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
