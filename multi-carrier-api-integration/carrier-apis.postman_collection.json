@@ -1,0 +1,102 @@
+{
+	"info": {
+		"_postman_id": "05f0dd93-1c3f-4e32-af6b-27c0f5837ed2",
+		"name": "carrier-apis",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "54558812",
+		"_collection_link": "https://vaibhavi-upreti-1432750.postman.co/workspace/Vaibhavi-Upreti's-Workspace~69e0e4c3-1c6a-4382-8bd4-37d8186dcedb/collection/54558812-05f0dd93-1c3f-4e32-af6b-27c0f5837ed2?action=share&source=collection_link&creator=54558812"
+	},
+	"item": [
+		{
+			"name": "fedex",
+			"item": [
+				{
+					"name": "https://apis-sandbox.fedex.com/oauth/token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "l786eeed2db9b54389b9dc449b7fd712be",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "2c66ff22a60046d9bd256fb3764388c6",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://apis-sandbox.fedex.com/oauth/token",
+							"protocol": "https",
+							"host": [
+								"apis-sandbox",
+								"fedex",
+								"com"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "https://apis.fedex.com/rate/v1/rates/quotes",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJDWFMtVFAiXSwiUGF5bG9hZCI6eyJjbGllbnRJZGVudGl0eSI6eyJjbGllbnRLZXkiOiJsNzg2ZWVlZDJkYjliNTQzODliOWRjNDQ5YjdmZDcxMmJlIn0sImF1dGhlbnRpY2F0aW9uUmVhbG0iOiJDTUFDIiwiYWRkaXRpb25hbElkZW50aXR5Ijp7InRpbWVTdGFtcCI6IjIzLUp1bi0yMDI2IDA2OjAzOjM2IEVTVCIsImdyYW50X3R5cGUiOiJjbGllbnRfY3JlZGVudGlhbHMiLCJhcGltb2RlIjoiU2FuZGJveCIsImN4c0lzcyI6Imh0dHBzOi8vY3hzYXV0aHNlcnZlci1zdGFnaW5nLmFwcC5wYWFzLmZlZGV4LmNvbS90b2tlbi9vYXV0aDIifSwicGVyc29uYVR5cGUiOiJEaXJlY3RJbnRlZ3JhdG9yX0IyQiJ9LCJleHAiOjE3ODIyMTYyMTYsImp0aSI6ImZlMmMyZTViLWYwYmMtNDk2ZC1iNGM0LTRhN2RlMzEwZmFhMSJ9.FRTOIy9ZzBmMI32IEJ34tzxDe7mt8ttGANJJz73tS2vOMOZgB7qaFDv9z5T-LhLZ1AXdf7v6AWmSnHecAURFVc20Knp869YYMqC2Vq-bVR3mUwLmPLrSwoRH6YvJK4ISzqYwK-Wsrqmd3uiMEmMbjoFzsOLKpWGspbHerI_KCdp1ZZfHLq5YqCOzvuoRt2N3oTz54LeSuKm5zsbclYSmWOLLqIYVQ-3Qw6CtEhNv-1x8f8g83i92SKesxS3XRx02jv8ETvrHNKo1C3OZ4PuWBgk6wn4YdVaOdITZEEK0hjnRvT7lvor7Hlh3a_NNmhZiZCdx2808JLaly_tDVwETPQnh8k-p9x031DKdOFO2EsTX-dBkO50y83oPrpWfcBLbo2lHyhwKx6wEZbVtSzBUsvwU-kjMnB12ayohngcf97scC-bpHJgi0iQzYl-7-JtmZnjnsoi2BmUrNC00hGfnTTMcY6PN-HCvevWEPfD9YlohQS-P0p1UuztNx2BhKKEhZ01fQF6TfB3YfUjKUvLjeqS7MvTClHIuJpSugS9tnScPGMSker0PPWli7vrUCnniGKgQPG11dDAdthBDjXt8D-Wq2lBUmngPvkPXVBm62RTreyC8QoXwNE-o32Z1rSEiZyKwn3rhrPeYE7StaKgv9UKSJrJp_D9s-is9i68do_g",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"accountNumber\": {\n    \"value\": \"XXXXX7354\"\n  },\n  \"requestedShipment\": {\n    \"shipper\": {\n      \"address\": {\n        \"postalCode\": \"65247\",\n        \"countryCode\": \"US\"\n      }\n    },\n    \"recipient\": {\n      \"address\": {\n        \"postalCode\": \"72348\",\n        \"countryCode\": \"US\"\n      }\n    },\n    \"pickupType\": \"DROPOFF_AT_FEDEX_LOCATION\", // how to store this? data model? --check \n    \"rateRequestType\": [\n      \"ACCOUNT\",\n      \"LIST\"\n    ],\n    \"requestedPackageLineItems\": [\n      {\n        \"weight\": {\n          \"units\": \"LB\",\n          \"value\": \"10\"\n        }\n      }\n    ]\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://apis-sandbox.fedex.com/rate/v1/rates/quotes",
+							"protocol": "https",
+							"host": [
+								"apis-sandbox",
+								"fedex",
+								"com"
+							],
+							"path": [
+								"rate",
+								"v1",
+								"rates",
+								"quotes"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
