@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<entity-engine-xml>
+    <OmsOrderHeader orderId="ORD501" orderTypeId="SALES_ORDER" statusId="PARTIALLY_FULFILLED" orderDate="2025-03-10 00:00:00.0"/>
+    <OmsOrderPart orderId="ORD501" orderPartSeqId="00001" customerPartyId="DEMO_CUSTOMER_1" postalContactMechId="30003" statusId="COMPLETED" partTotal="1524.99"/>
+    <OmsOrderItem orderId="ORD501" orderPartSeqId="00001" orderItemSeqId="00001" productId="PROD40001" quantity="1" unitPrice="1449.99"/>
+    <OmsOrderItem orderId="ORD501" orderPartSeqId="00001" orderItemSeqId="00003" parentItemSeqId="00001" productId="SALES_TAX" quantity="1" unitPrice="75.00"/>
+    
+    <OmsOrderPart orderId="ORD501" orderPartSeqId="00002" customerPartyId="DEMO_CUSTOMER_1" postalContactMechId="30003" statusId="CREATED" partTotal="1209.99"/>
+    <OmsOrderItem orderId="ORD501" orderPartSeqId="00002" orderItemSeqId="00002" productId="PROD30002" quantity="1" unitPrice="1149.99"/>
+    <OmsOrderItem orderId="ORD501" orderPartSeqId="00002" orderItemSeqId="00004" parentItemSeqId="00002" productId="SALES_TAX" quantity="1" unitPrice="60.00"/>
+    
+    <OmsOrderHeader orderId="ORD302" orderTypeId="PURCHASE_ORDER" statusId="CREATED" orderDate="2025-03-10 00:00:00.0"/>
+    <OmsOrderPart orderId="ORD302" orderPartSeqId="00001" vendorPartyId="DEMO_SUPPLIER_1" postalContactMechId="30002" telecomContactMechId="30000" statusId="PART_PLACED" partTotal="72499.50"/>
+    <OmsOrderItem orderId="ORD302" orderPartSeqId="00001" orderItemSeqId="00001" productId="PROD40001" quantity="50" unitPrice="1449.99"/>
+
+    <!-- Additional sample data based on online shopping experience -->
+    <OmsOrderHeader orderId="DEMO_ORD_001" orderTypeId="SALES_ORDER" statusId="CREATED" orderDate="2026-07-15 14:30:00.0"/>
+    <OmsOrderPart orderId="DEMO_ORD_001" orderPartSeqId="00001" customerPartyId="DEMO_BUYER_1" postalContactMechId="DEMO_ADDR_01" statusId="CREATED" partTotal="189.00"/>
+    <OmsOrderItem orderId="DEMO_ORD_001" orderPartSeqId="00001" orderItemSeqId="00001" productId="USB_HUB" quantity="1" unitPrice="39.00"/>
+    <OmsOrderItem orderId="DEMO_ORD_001" orderPartSeqId="00001" orderItemSeqId="00002" productId="HDMI_CABLE" quantity="3" unitPrice="50.00"/>
+    <OmsOrderContactMech orderId="DEMO_ORD_001" contactMechPurposeTypeId="SHIPPING_LOCATION" contactMechId="DEMO_ADDR_01"/>
+    <OmsOrderStatus orderStatusId="STAT_201" statusId="CREATED" orderId="DEMO_ORD_001" statusDatetime="2026-07-15 14:30:00.0"/>
+    <OmsOrderAdjustment orderAdjustmentId="ADJ_201" orderAdjustmentTypeId="SHIPPING_CHARGES" orderId="DEMO_ORD_001" amount="12.50"/>
+    <OmsOrderPaymentPreference orderPaymentPreferenceId="PREF_201" orderId="DEMO_ORD_001" paymentMethodTypeId="CREDIT_CARD" statusId="PAYMENT_RECEIVED" maxAmount="201.50"/>
+</entity-engine-xml>

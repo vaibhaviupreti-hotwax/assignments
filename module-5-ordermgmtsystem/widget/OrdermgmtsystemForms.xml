@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://ofbiz.apache.org/Widget-Form" xsi:schemaLocation="http://ofbiz.apache.org/Widget-Form http://ofbiz.apache.org/dtds/widget-form.xsd">
+
+    <!-- OmsOrderHeader Forms -->
+    <form name="FindOmsOrderHeaders" type="single" target="FindOmsOrderHeader" default-entity-name="OmsOrderHeader">
+        <auto-fields-entity entity-name="OmsOrderHeader" default-field-type="find"/>
+        <field name="noConditionFind"><hidden value="Y"/></field>
+        <field name="searchButton" title="${uiLabelMap.CommonFind}" widget-style="smallSubmit"><submit button-type="button"/></field>
+    </form>
+    <form name="ListOmsOrderHeaders" type="list" list-name="listIt" paginate-target="FindOmsOrderHeader" default-entity-name="OmsOrderHeader" separate-columns="true"
+        odd-row-style="alternate-row" header-row-style="header-row-2" default-table-style="basic-table hover-bar">
+        <actions>
+            <service service-name="performFind" result-map="result" result-map-list="listIt">
+                <field-map field-name="inputFields" from-field="OmsOrderHeaderCtx"/>
+                <field-map field-name="entityName" value="OmsOrderHeader"/>
+                <field-map field-name="orderBy" value="-orderDate"/>
+                <field-map field-name="viewIndex" from-field="viewIndex"/>
+                <field-map field-name="viewSize" from-field="viewSize"/>
+            </service>
+        </actions>
+        <auto-fields-entity entity-name="OmsOrderHeader" default-field-type="display"/>
+        <field name="orderId" title="Order ID" widget-style="buttontext">
+            <hyperlink description="${orderId}" target="EditOmsOrderHeader">
+                <parameter param-name="orderId"/>
+            </hyperlink>
+        </field>
+        <field name="deleteLink" title=" " widget-style="buttontext">
+            <hyperlink description="${uiLabelMap.CommonDelete}" target="deleteOmsOrderHeader" also-hidden="false">
+                <parameter param-name="orderId"/>
+            </hyperlink>
+        </field>
+    </form>
+    <form name="EditOmsOrderHeader" type="single" target="updateOmsOrderHeader" title="" default-map-name="omsOrderHeader" default-entity-name="OmsOrderHeader">
+        <alt-target use-when="omsOrderHeader==null" target="createOmsOrderHeader"/>
+        <auto-fields-service service-name="updateOmsOrderHeader"/>
+        <field use-when="omsOrderHeader!=null" name="orderId" title="Order ID"><display/></field>
+        <field use-when="omsOrderHeader==null @and orderId==null" name="orderId" title="Order ID"><text/></field>
+        <field use-when="omsOrderHeader==null @and orderId!=null" name="orderId" title="Order ID"><display description="${uiLabelMap.CommonCannotBeFound}: [${orderId}]" also-hidden="false"/></field>
+        <field name="submitButton" title="${uiLabelMap.CommonSubmit}" widget-style="smallSubmit"><submit button-type="button"/></field>
+    </form>
+
+    <!-- OmsOrderPart Forms -->
+    <form name="ListOmsOrderParts" type="list" list-name="omsOrderParts" default-entity-name="OmsOrderPart" separate-columns="true"
+        odd-row-style="alternate-row" header-row-style="header-row-2" default-table-style="basic-table hover-bar">
+        <actions>
+            <entity-condition entity-name="OmsOrderPart">
+                <condition-expr field-name="orderId" from-field="orderId"/>
+                <order-by field-name="orderPartSeqId"/>
+            </entity-condition>
+        </actions>
+        <auto-fields-entity entity-name="OmsOrderPart" default-field-type="display"/>
+        <field name="orderId"><hidden/></field>
+        <field name="orderPartSeqId" title="Order Part Seq ID" widget-style="buttontext">
+            <hyperlink description="${orderPartSeqId}" target="EditOmsOrderPart">
+                <parameter param-name="orderId"/>
+                <parameter param-name="orderPartSeqId"/>
+            </hyperlink>
+        </field>
+        <field name="deleteLink" title=" " widget-style="buttontext">
+            <hyperlink description="${uiLabelMap.CommonDelete}" target="deleteOmsOrderPart" also-hidden="false">
+                <parameter param-name="orderId"/>
+                <parameter param-name="orderPartSeqId"/>
+            </hyperlink>
+        </field>
+    </form>
+    <form name="EditOmsOrderPart" type="single" target="updateOmsOrderPart" title="" default-map-name="omsOrderPart" default-entity-name="OmsOrderPart">
+        <alt-target use-when="omsOrderPart==null" target="createOmsOrderPart"/>
+        <auto-fields-service service-name="updateOmsOrderPart"/>
+        <field name="orderId"><hidden value="${orderId}"/></field>
+        <field use-when="omsOrderPart!=null" name="orderPartSeqId" title="Order Part Seq ID"><display/></field>
+        <field use-when="omsOrderPart==null" name="orderPartSeqId" title="Order Part Seq ID"><text/></field>
+        <field name="submitButton" title="${uiLabelMap.CommonSubmit}" widget-style="smallSubmit"><submit button-type="button"/></field>
+    </form>
+
+    <!-- OmsOrderItem Forms -->
+    <form name="ListOmsOrderItems" type="list" list-name="omsOrderItems" default-entity-name="OmsOrderItem" separate-columns="true"
+        odd-row-style="alternate-row" header-row-style="header-row-2" default-table-style="basic-table hover-bar">
+        <actions>
+            <entity-condition entity-name="OmsOrderItem">
+                <condition-expr field-name="orderId" from-field="orderId"/>
+                <order-by field-name="orderItemSeqId"/>
+            </entity-condition>
+        </actions>
+        <auto-fields-entity entity-name="OmsOrderItem" default-field-type="display"/>
+        <field name="orderId"><hidden/></field>
+        <field name="orderItemSeqId" title="Order Item Seq ID" widget-style="buttontext">
+            <hyperlink description="${orderItemSeqId}" target="EditOmsOrderItem">
+                <parameter param-name="orderId"/>
+                <parameter param-name="orderPartSeqId"/>
+                <parameter param-name="orderItemSeqId"/>
+            </hyperlink>
+        </field>
+        <field name="deleteLink" title=" " widget-style="buttontext">
+            <hyperlink description="${uiLabelMap.CommonDelete}" target="deleteOmsOrderItem" also-hidden="false">
+                <parameter param-name="orderId"/>
+                <parameter param-name="orderPartSeqId"/>
+                <parameter param-name="orderItemSeqId"/>
+            </hyperlink>
+        </field>
+    </form>
+    <form name="EditOmsOrderItem" type="single" target="updateOmsOrderItem" title="" default-map-name="omsOrderItem" default-entity-name="OmsOrderItem">
+        <alt-target use-when="omsOrderItem==null" target="createOmsOrderItem"/>
+        <auto-fields-service service-name="updateOmsOrderItem"/>
+        <field name="orderId"><hidden value="${orderId}"/></field>
+        <field use-when="omsOrderItem!=null" name="orderPartSeqId" title="Order Part Seq ID"><display/></field>
+        <field use-when="omsOrderItem==null" name="orderPartSeqId" title="Order Part Seq ID"><text/></field>
+        <field use-when="omsOrderItem!=null" name="orderItemSeqId" title="Order Item Seq ID"><display/></field>
+        <field use-when="omsOrderItem==null" name="orderItemSeqId" title="Order Item Seq ID"><text/></field>
+        <field name="submitButton" title="${uiLabelMap.CommonSubmit}" widget-style="smallSubmit"><submit button-type="button"/></field>
+    </form>
+
+    <!-- OmsOrderContactMech Forms -->
+    <form name="ListOmsOrderContactMechs" type="list" list-name="omsOrderContactMechs" default-entity-name="OmsOrderContactMech" separate-columns="true"
+        odd-row-style="alternate-row" header-row-style="header-row-2" default-table-style="basic-table hover-bar">
+        <actions>
+            <entity-condition entity-name="OmsOrderContactMech">
+                <condition-expr field-name="orderId" from-field="orderId"/>
+            </entity-condition>
+        </actions>
+        <auto-fields-entity entity-name="OmsOrderContactMech" default-field-type="display"/>
+        <field name="orderId"><hidden/></field>
+        <field name="deleteLink" title=" " widget-style="buttontext">
+            <hyperlink description="${uiLabelMap.CommonDelete}" target="deleteOmsOrderContactMech" also-hidden="false">
+                <parameter param-name="orderId"/>
+                <parameter param-name="contactMechPurposeTypeId"/>
+                <parameter param-name="contactMechId"/>
+            </hyperlink>
+        </field>
+    </form>
+    <form name="AddOmsOrderContactMech" type="single" target="createOmsOrderContactMech" title="" default-entity-name="OmsOrderContactMech">
+        <auto-fields-service service-name="createOmsOrderContactMech"/>
+        <field name="orderId"><hidden value="${orderId}"/></field>
+        <field name="submitButton" title="${uiLabelMap.CommonSubmit}" widget-style="smallSubmit"><submit button-type="button"/></field>
+    </form>
+
+    <!-- OmsOrderStatus Forms -->
+    <form name="ListOmsOrderStatuses" type="list" list-name="omsOrderStatuses" default-entity-name="OmsOrderStatus" separate-columns="true"
+        odd-row-style="alternate-row" header-row-style="header-row-2" default-table-style="basic-table hover-bar">
+        <actions>
+            <entity-condition entity-name="OmsOrderStatus">
+                <condition-expr field-name="orderId" from-field="orderId"/>
+            </entity-condition>
+        </actions>
+        <auto-fields-entity entity-name="OmsOrderStatus" default-field-type="display"/>
+        <field name="orderId"><hidden/></field>
+        <field name="deleteLink" title=" " widget-style="buttontext">
+            <hyperlink description="${uiLabelMap.CommonDelete}" target="deleteOmsOrderStatus" also-hidden="false">
+                <parameter param-name="orderStatusId"/>
+            </hyperlink>
+        </field>
+    </form>
+    <form name="AddOmsOrderStatus" type="single" target="createOmsOrderStatus" title="" default-entity-name="OmsOrderStatus">
+        <auto-fields-service service-name="createOmsOrderStatus"/>
+        <field name="orderId"><hidden value="${orderId}"/></field>
+        <field name="submitButton" title="${uiLabelMap.CommonSubmit}" widget-style="smallSubmit"><submit button-type="button"/></field>
+    </form>
+</forms>
