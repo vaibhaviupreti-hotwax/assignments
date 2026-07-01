@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/entity-definition-3.xsd">
+    <entity entity-name="MoquiTraining" package="moquitraining">
+        <field name="trainingId" type="id" is-pk="true"/>
+        <field name="trainingName" type="text-medium"/>
+        <field name="trainingDate" type="date"/>
+        <field name="trainingPrice" type="number-decimal"/>
+        <field name="trainingDuration" type ="number-integer"/>
+    </entity>
+    
+<!--    <entity entity-name="Party" package="moquitraining">-->
+<!--        <field name="partyId" type="id" is-pk="true"/>-->
+<!--        <field name="partyType" type="text-medium" not-null="true"/>-->
+<!--        <field name="firstName" type="text-medium"/>-->
+<!--        <field name="lastName" type="text-medium"/>-->
+
+<!--        <relationship type="many" related="ContactMech" title="ContactMechs" short-alias="contacts" mutable="true">-->
+<!--            <key-map field-name="partyId" related="partyId"/>-->
+<!--        </relationship>-->
+
+<!--        <relationship type="many" related="OrderHeader" title="OrderHeaders" short-alias="headers" mutable="true">-->
+<!--            <key-map field-name="partyId" related="partyId"/>-->
+<!--        </relationship>-->
+<!--    </entity>-->
+
+<!--    <entity entity-name="ContactMech" package="moquitraining">-->
+<!--        <field name="contactMechId" type="id" is-pk="true"/>-->
+<!--        <field name="partyId" type="text-short"/>-->
+<!--        <field name="streetAddress" type="text-long" not-null="true"/>-->
+<!--        <field name="city" type="text-short"/>-->
+<!--        <field name="state" type="text-short"/>-->
+<!--        <field name="postalCode" type="text-short"/>-->
+<!--        -->
+<!--        <relationship type="one" related="Party" title="Party" short-alias="party">-->
+<!--            <key-map field-name="partyId"/>-->
+<!--        </relationship>-->
+
+<!--        <relationship type="many" related="OrderHeader" title="OrderHeaders" short-alias="headers" mutable="true">-->
+<!--            <key-map field-name="contactMechId" related="shippingContactMechId"/>-->
+<!--            <key-map field-name="contactMechId" related="billingContactMechId"/>-->
+<!--        </relationship>-->
+<!--    </entity>-->
+
+<!--    <entity entity-name="Product" package="moquitraining">-->
+<!--        <field name="productId" type="id" is-pk="true"/>-->
+<!--        <field name="productName" type="text-medium" not-null="true"/>-->
+<!--        <field name="color" type="text-short"/>-->
+<!--        <field name="size" type="text-short"/>-->
+<!--    </entity>-->
+
+<!--    <entity entity-name="OrderHeader" package="moquitraining">-->
+<!--        <field name="orderId" type="id" is-pk="true"/>-->
+<!--        <field name="partyId" type="text-short"/>-->
+<!--        <field name="orderDate" type="date" not-null="true"/>-->
+<!--        <field name="shippingContactMechId" type="text-short"/>-->
+<!--        <field name="billingContactMechId" type="text-short"/>-->
+
+<!--        <relationship type="one" related="Party" title="Party" short-alias="party">-->
+<!--            <key-map field-name="partyId"/>-->
+<!--        </relationship>-->
+
+<!--        <relationship type="one" related="ContactMech" title="ShippingContactMech" short-alias="shippingContactMech">-->
+<!--            <key-map field-name="shippingContactMechId"/>-->
+<!--        </relationship>-->
+
+<!--        <relationship type="one" related="ContactMech" title="BillingContactMech" short-alias="billingContactMech">-->
+<!--            <key-map field-name="billingContactMechId"/>-->
+<!--        </relationship>-->
+
+<!--        <relationship type="many" related="OrderItem" title="OrderItems" short-alias="items" mutable="true">-->
+<!--            <key-map field-name="orderId" related="orderId"/>-->
+<!--        </relationship>-->
+<!--    </entity>-->
+
+<!--    <entity entity-name="OrderItem" package="moquitraining">-->
+<!--        <field name="orderItemSeqId" type="id" is-pk="true"/>-->
+<!--        <field name="orderId" type="text-short"/>-->
+<!--        <field name="productId" type="text-short"/>-->
+<!--        <field name="quantity" type="number-integer"/>-->
+<!--        <field name="status" type="text-short"/>-->
+
+<!--        <relationship type="one" related="OrderHeader" title="OrderHeader" short-alias="orderHeader">-->
+<!--            <key-map field-name="orderId"/>-->
+<!--        </relationship>-->
+
+<!--        <relationship type="one" related="Product" title="Product" short-alias="product">-->
+<!--            <key-map field-name="productId"/>-->
+<!--        </relationship>-->
+<!--    </entity>-->
+
+<!--    delete this one-very first entity find written by me -->
+<!--    <view-entity entity-name="A1Q01NewCustomers" package="co.hotwax.upreti">-->
+<!--        <member-entity entity-alias="P" entity-name="org.apache.ofbiz.party.party.Party"/>-->
+<!--        <member-entity entity-alias="PER" entity-name="org.apache.ofbiz.party.party.Person"/>-->
+<!--        <member-entity entity-alias="PCM_EMAIL" entity-name="org.apache.ofbiz.party.contact.PartyContactMechPurpose" join-from-alias="P" join-optional="true">-->
+<!--            <key-map field-name="partyId" />-->
+<!--            <entity-condition>-->
+<!--                <date-filter/>-->
+<!--                <econdition field-name="contactMechPurposeTypeId" value="PRIMARY_EMAIL" />-->
+<!--            </entity-condition>-->
+<!--        </member-entity>-->
+<!--        <member-entity entity-alias="PCMP" entity-name="org.apache.ofbiz.party.contact.PartyContactMechPurpose" join-from-alias="P" join-optional="true">-->
+<!--            <key-map field-name="partyId" />-->
+<!--        </member-entity>-->
+<!--        <member-entity entity-alias="ECM" entity-name="org.apache.ofbiz.party.contact.ContactMech" join-from-alias="PCMP" join-optional="true">-->
+<!--            <key-map field-name="contactMechId" />-->
+<!--        </member-entity>-->
+<!--        <member-entity entity-alias="PCMP" entity-name="org.apache.ofbiz.party.contact.PartyContactMechPurpose" join-from-alias="ECM" join-optional="true">-->
+<!--            <key-map field-name="partyId" />-->
+<!--        </member-entity>-->
+<!--    </view-entity>-->
+
+<!-- <<============================Assignment Queries view entity=======================================>> -->
+    <!--    query 01 - A1Q02PhysicalProducts -->
+<!--    SELECT-->
+<!--    P.PARTY_ID,-->
+<!--    PER.FIRST_NAME,-->
+<!--    PER.LAST_NAME,-->
+<!--    ECM.INFO_STRING,-->
+<!--    CONCAT(-->
+<!--    TN.COUNTRY_CODE, ' ', TN.AREA_CODE,-->
+<!--    ' ', TN.CONTACT_NUMBER-->
+<!--    )-->
+<!--    FROM-->
+<!--    PARTY P-->
+<!--    INNER JOIN PERSON PER ON P.PARTY_ID = PER.PARTY_ID-->
+<!--    LEFT OUTER JOIN PARTY_CONTACT_MECH_PURPOSE PCMP ON PER.PARTY_ID = PCMP.PARTY_ID-->
+<!--    AND (-->
+<!--    (-->
+<!--    (-->
+<!--    PCMP.FROM_DATE IS NULL-->
+<!--    OR PCMP.FROM_DATE <= ?-->
+<!--    )-->
+<!--    AND (-->
+<!--    PCMP.THRU_DATE IS NULL-->
+<!--    OR PCMP.THRU_DATE > ?-->
+<!--    )-->
+<!--    )-->
+<!--    AND PCMP.CONTACT_MECH_PURPOSE_TYPE_ID = ?-->
+<!--    )-->
+<!--    LEFT OUTER JOIN CONTACT_MECH ECM ON PCMP.CONTACT_MECH_ID = ECM.CONTACT_MECH_ID-->
+<!--    LEFT OUTER JOIN PARTY_CONTACT_MECH_PURPOSE TPCM ON PER.PARTY_ID = TPCM.PARTY_ID-->
+<!--    AND (-->
+<!--    (-->
+<!--    (-->
+<!--    TPCM.FROM_DATE IS NULL-->
+<!--    OR TPCM.FROM_DATE <= ?-->
+<!--    )-->
+<!--    AND (-->
+<!--    TPCM.THRU_DATE IS NULL-->
+<!--    OR TPCM.THRU_DATE > ?-->
+<!--    )-->
+<!--    )-->
+<!--    AND TPCM.CONTACT_MECH_PURPOSE_TYPE_ID = ?-->
+<!--    )-->
+<!--    LEFT OUTER JOIN TELECOM_NUMBER TN ON TPCM.CONTACT_MECH_ID = TN.CONTACT_MECH_ID-->
+<!--    ORDER BY-->
+<!--    1-->
+<!--    LIMIT-->
+<!--    100 OFFSET 0-->
+    <view-entity entity-name="A1Q01NewCustomers" package="co.hotwax.upreti">
+        <member-entity entity-alias="P" entity-name="org.apache.ofbiz.party.party.Party" />
+        <member-entity entity-alias="PER" entity-name="org.apache.ofbiz.party.party.Person" join-from-alias="P">
+            <key-map field-name="partyId"/>
+        </member-entity>
+        <member-entity entity-alias="PCMP" entity-name="org.apache.ofbiz.party.contact.PartyContactMechPurpose" join-from-alias="PER" join-optional="true">
+            <key-map field-name="partyId"/>
+            <entity-condition>
+                <date-filter/>
+                <econdition field-name="contactMechPurposeTypeId" value="PRIMARY_EMAIL"/>
+            </entity-condition>
+        </member-entity>
+        <member-entity entity-alias="ECM" entity-name="org.apache.ofbiz.party.contact.ContactMech" join-from-alias="PCMP" join-optional="true">
+            <key-map field-name="contactMechId"/>
+        </member-entity>
+        <member-entity entity-alias="TPCM" entity-name="org.apache.ofbiz.party.contact.PartyContactMechPurpose" join-from-alias="ECM" join-optional="true">
+            <key-map field-name="contactMechId"/>
+            <entity-condition>
+                <date-filter/>
+                <econdition field-name="contactMechPurposeTypeId" value="PRIMARY_PHONE"/>
+            </entity-condition>
+        </member-entity>
+        <member-entity entity-alias="TN" entity-name="org.apache.ofbiz.party.contact.TelecomNumber" join-from-alias="TPCM" join-optional="true">
+            <key-map field-name="contactMechId"/>
+        </member-entity>
+        <alias-all entity-alias="PER"><exclude field="partyId"/></alias-all>
+        <alias-all entity-alias="PCMP"><exclude field="partyId"/></alias-all>
+        <alias-all entity-alias="ECM"><exclude field="contactMechId"/></alias-all>
+        <alias-all entity-alias="TPCM"><exclude field="partyId"/></alias-all>
+        <alias-all entity-alias="TN"><exclude field="contactMechId"/></alias-all>
+        <alias-all entity-alias="P"/>
+    </view-entity>
+
+<!--    <view-entity entity-name="TestEntity" package="co.hotwax.upreti">-->
+<!--        <member-entity entity-alias="P" entity-name="org.apache.ofbiz.party.party.Party"/>-->
+<!--        <member-entity entity-alias="PER" entity-name="org.apache.ofbiz.party.party.Person" join-from-alias="P">-->
+<!--            <key-map field-name="partyId"/>-->
+<!--        </member-entity>-->
+<!--        <alias-all entity-alias="PER"><exclude field="partyId"/></alias-all>-->
+<!--        <alias-all entity-alias="P"/>-->
+<!--    </view-entity>-->
+
+
+<!--    <view-entity entity-name="PartyContacts" package="co.hotwax.user">-->
+<!--        <member-entity entity-alias="PCMP" entity-name="org.apache.ofbiz.party.contact.PartyContactMechPurpose"/>-->
+<!--        <member-entity entity-alias="ECM" entity-name="org.apache.ofbiz.party.contact.ContactMech" join-from-alias="PCMP" join-optional="true">-->
+<!--            <key-map field-name="contactMechId"/>-->
+<!--        </member-entity>-->
+<!--        <member-entity entity-alias="ADDR" entity-name="org.apache.ofbiz.party.contact.PostalAddress" join-from-alias="PCMP" join-optional="true">-->
+<!--            <key-map field-name="contactMechId"/>-->
+<!--        </member-entity>-->
+<!--        <member-entity entity-alias="TN" entity-name="org.apache.ofbiz.party.contact.TelecomNumber" join-from-alias="PCMP" join-optional="true">-->
+<!--            <key-map field-name="contactMechId"/>-->
+<!--        </member-entity>-->
+<!--        <alias-all entity-alias="ECM">-->
+<!--            <exclude field="contactMechId"/>-->
+<!--        </alias-all>-->
+<!--        <alias-all entity-alias="ADDR">-->
+<!--            <exclude field="contactMechId"/>-->
+<!--        </alias-all>-->
+<!--        <alias-all entity-alias="TN">-->
+<!--            <exclude field="contactMechId"/>-->
+<!--        </alias-all>-->
+<!--        <alias-all entity-alias="PCMP"/>-->
+<!--        <entity-condition><date-filter/></entity-condition>-->
+<!--    </view-entity>-->
+
+    <!--    query 02 - A1Q02PhysicalProducts -->
+<!--    select p.PRODUCT_ID, p.PRODUCT_TYPE_ID, p.INTERNAL_NAME from product p-->
+<!--    join-->
+<!--    product_type pt on p.PRODUCT_TYPE_ID = pt.PRODUCT_TYPE_ID and pt.IS_PHYSICAL = 'Y';-->
+    <view-entity entity-name="A1Q02PhysicalProducts" package="co.hotwax.upreti">
+        <member-entity entity-alias="P" entity-name="org.apache.ofbiz.product.product.Product"/>
+        <member-entity entity-alias="PT" entity-name="org.apache.ofbiz.product.product.ProductType" join-from-alias="P">
+            <key-map field-name="productTypeId"/>
+            <entity-condition>
+                <econdition field-name="isPhysical" value="Y"/>
+            </entity-condition>
+        </member-entity>
+        <alias-all entity-alias="PT">
+            <exclude field="productTypeId"/>
+        </alias-all>
+    </view-entity>
+
+    <!--    query 03 - A1Q03ProductsMissingNetSuiteID -->
+    <!--    select p.PRODUCT_ID, p.INTERNAL_NAME , p.PRODUCT_TYPE_ID , gi.ID_VALUE  from product p-->
+    <!--    join good_identification gi on p.PRODUCT_ID = gi.PRODUCT_ID-->
+    <!--    and gi.GOOD_IDENTIFICATION_TYPE_ID = 'ERP_ID' and gi.ID_VALUE  is null;-->
+    <view-entity entity-name="A1Q03ProductsMissingNetSuiteID" package="co.hotwax.upreti">
+        <member-entity entity-alias="P" entity-name="org.apache.ofbiz.product.product.Product"/>
+        <member-entity entity-alias="GI" entity-name="org.apache.ofbiz.product.product.GoodIdentification" join-from-alias="P">
+            <key-map field-name="productId" />
+            <entity-condition>
+                <econdition field-name="goodIdentificationTypeId" value="ERP_ID"/>
+                <econdition field-name="idValue" value=""/>
+            </entity-condition>
+        </member-entity>
+        <alias-all entity-alias="GI">
+            <exclude field="productId"/>
+        </alias-all>
+        <alias-all entity-alias="P"/>
+    </view-entity>
+
+    <!--    query 04 - A1Q04SyncAcrossSystems -->
+<!--    SELECT-->
+<!--    p.PRODUCT_ID as Hotwax_ID,-->
+<!--    gi_erp.ID_VALUE AS ERP_ID,-->
+<!--    gi_prod.ID_VALUE AS SHOPIFY_PROD_ID-->
+<!--    FROM product p-->
+<!--    LEFT JOIN good_identification gi_erp-->
+<!--    ON gi_erp.PRODUCT_ID = p.PRODUCT_ID-->
+<!--    AND gi_erp.GOOD_IDENTIFICATION_TYPE_ID = 'ERP_ID'-->
+<!--    LEFT JOIN good_identification gi_prod-->
+<!--    ON gi_prod.PRODUCT_ID = p.PRODUCT_ID-->
+<!--    AND gi_prod.GOOD_IDENTIFICATION_TYPE_ID = 'SHOPIFY_PROD_ID';-->
+<view-entity entity-name="A1Q04SyncAcrossSystems" package="co.hotwax.upreti">
+    <member-entity entity-alias="P" entity-name="org.apache.ofbiz.product.product.Product"/>
+    <member-entity entity-alias="GIERP" entity-name="org.apache.ofbiz.product.product.GoodIdentification" join-from-alias="P" join-optional="true">
+        <key-map field-name="productId"/>
+        <entity-condition>
+            <econdition field-name="goodIdentificationTypeId" value="ERP_ID"/>
+        </entity-condition>
+    </member-entity>
+    <member-entity entity-alias="GIPROD" entity-name="org.apache.ofbiz.product.product.GoodIdentification" join-from-alias="P" join-optional="true">
+        <key-map field-name="productId"/>
+        <entity-condition>
+            <econdition field-name="goodIdentificationTypeId" value="SHOPIFY_PROD_ID"/>
+        </entity-condition>
+    </member-entity>
+    <alias-all entity-alias="P"/>
+    <alias-all entity-alias="GIERP">
+        <exclude field="productId"/>
+    </alias-all>
+</view-entity>
+
+    <!--    query 05 - A1Q05AugustCompletedOrders -->
+<!--    select oi.PRODUCT_ID , p.PRODUCT_TYPE_ID , oh.PRODUCT_STORE_ID , oi.QUANTITY, oi.EXTERNAL_ID ,-->
+<!--    oi.ORDER_ID , oi.ORDER_ITEM_SEQ_ID , oisg.FACILITY_ID, oi.EXTERNAL_ID ,-->
+<!--    ohs.ORDER_HISTORY_ID , oisg.SHIP_GROUP_SEQ_ID from-->
+<!--    order_header oh-->
+<!--    join-->
+<!--    order_status os on os.ORDER_ID = oh.ORDER_ID-->
+<!--    join-->
+<!--    order_item oi on oh.ORDER_ID = oi.ORDER_ID-->
+<!--    and os.STATUS_ID = 'ORDER_COMPLETED' and os.STATUS_DATETIME >= '2023-08-01' and os.STATUS_DATETIME <= '2023-08-31'-->
+<!--    join-->
+<!--    order_item_ship_group oisg on oi.ORDER_ID = oisg.ORDER_ID and oi.SHIP_GROUP_SEQ_ID = oisg.SHIP_GROUP_SEQ_ID-->
+<!--    join-->
+<!--    order_history ohs on oi.ORDER_ID = ohs.ORDER_ID and oi.ORDER_ITEM_SEQ_ID = ohs.ORDER_ITEM_SEQ_ID and ohs.SHIP_GROUP_SEQ_ID = oisg.SHIP_GROUP_SEQ_ID-->
+<!--    join-->
+<!--    product p on p.PRODUCT_ID = oi.PRODUCT_ID;-->
+    <view-entity entity-name="A1Q05AugustCompletedOrders" package="co.hotwax.upreti">
+        <member-entity entity-alias="OH" entity-name="org.apache.ofbiz.order.order.OrderHeader"/>
+        <member-entity entity-alias="OS" entity-name="org.apache.ofbiz.order.order.OrderStatus" join-from-alias="OH">
+            <key-map field-name="orderId"/>
+        </member-entity>
+        <member-entity entity-alias="OI" entity-name="org.apache.ofbiz.order.order.OrderItem">
+            <key-map field-name="orderId"/>
+            <entity-condition>
+                <econdition field-name="statusId" value="ORDER_COMPLETED"/>
+                <econdition field-name="statusDatetime" operator="greater-equals" value="2025-08-01"/>
+                <econdition field-name="statusDatetime" operator="less-equals" value="2026-08-01"/>
+            </entity-condition>
+        </member-entity>
+        <member-entity entity-alias="OISG" entity-name="org.apache.ofbiz.order.order.OrderItemShipGroup">
+            <key-map field-name="orderId"/>
+            <key-map field-name="shipGroupSeqId"/>
+            <key-map field-name="orderItemSeqId"/>
+        </member-entity>
+        <member-entity entity-alias="OHST" entity-name="co.hotwax.customerservice.order.OrderHistory">
+            <key-map field-name="orderId"/>
+        </member-entity>
+        <member-entity entity-alias="P" entity-name="org.apache.ofbiz.product.product.Product" join-from-alias="OI">
+            <key-map field-name="productId"/>
+        </member-entity>
+    </view-entity>
+
+    <!--    query 06 - A1Q06 -->
+<!--    select oh.ORDER_ID , oh.GRAND_TOTAL , opp.PAYMENT_METHOD_ID , oh.ORDER_NAME from-->
+<!--    order_header oh-->
+<!--    join-->
+<!--    order_payment_preference opp on oh.ORDER_ID = opp.ORDER_ID;-->
+    <view-entity entity-name="A1Q06NewOrdersAndPayments" package="co.hotwax.upreti">
+        <member-entity entity-alias="OH" entity-name="org.apache.ofbiz.order.order.OrderHeader"/>
+        <member-entity entity-alias="OPP" entity-name="org.apache.ofbiz.order.order.OrderPaymentPreference" join-from-alias="OH">
+            <key-map field-name="orderId"/>
+        </member-entity>
+    </view-entity>
+
+    <!--    query 07 - A1Q07PaidNotShipped -->
+<!--    select oh.ORDER_ID , oh.STATUS_ID , opp.STATUS_ID , s.STATUS_ID  from-->
+<!--    order_header oh-->
+<!--    join order_payment_preference opp on oh.ORDER_ID = opp.ORDER_ID and opp.STATUS_ID = 'PAYMENT_RECIEVED'-->
+<!--    join shipment s on s.PRIMARY_ORDER_ID = oh.ORDER_ID and s.STATUS_ID != 'SHIPMENT_SHIPPED';-->
+    <!--    <view-entity entity-name="A1Q06" package="co.hotwax.upreti">-->
+    <!--        <member-entity entity-alias="" entity-name=""></member-entity>-->
+    <!--    </view-entity>-->
+    <view-entity entity-name="OH" package="A1Q07PaidNotShipped">
+        <member-entity entity-alias="OH" entity-name="org.apache.ofbiz.order.order.OrderHeader"/>
+        <member-entity entity-alias="OPP" entity-name="org.apache.ofbiz.order.order.OrderPaymentPreference">
+            <key-map field-name="orderId"/>
+            <entity-condition>
+                <econdition field-name="statusId" value="PAYMENT_RECIEVED"/>
+            </entity-condition>
+        </member-entity>
+        <member-entity entity-alias="S" entity-name="org.apache.ofbiz.shipment.shipment.Shipment">
+<!--            s.PRIMARY_ORDER_ID = oh.ORDER_ID-->
+<!--            <key-map field-name="OH.orderId"/>-->
+            <entity-condition>
+                <econdition field-name="statusId" operator="not-equals" value="SHIPMENT_SHIPPED"/>
+            </entity-condition>
+        </member-entity>
+    </view-entity>
+
+    <!--    query 08 - A1Q08 -->
+<!--    SELECT-->
+<!--    hour(os.STATUS_DATETIME) as hour,-->
+<!--    count(*) as total_orders-->
+<!--    from order_status os-->
+<!--    where os.STATUS_ID = 'ORDER_COMPLETED'-->
+<!--    and os.STATUS_DATETIME >= '2021-08-18 00:00:00' and os.STATUS_DATETIME < '2021-08-19 00:00:00'-->
+<!--    group by hour;-->
+    <view-entity entity-name="OrderCompletedHourly" package="">
+        <member-entity entity-alias="" entity-name=""></member-entity>
+    </view-entity>
+
+<!--    select count(*) from order_status os-->
+<!--    where os.STATUS_DATETIME like '%2021-08-18%' and os.STATUS_ID = 'ORDER_COMPLETED'; &#45;&#45; for rechecking-->
+
+    <!--    query 09 - A1Q09BopisOrderRevenue -->
+<!--    select count(*), sum(oh.GRAND_TOTAL) from order_header oh-->
+<!--    join shipment s on oh.ORDER_ID = s.PRIMARY_ORDER_ID and s.SHIPMENT_METHOD_TYPE_ID = 'STOREPICKUP'-->
+<!--    and oh.SALES_CHANNEL_ENUM_ID = 'WEB_SALES_CHANNEL'-->
+<!--    and oh.ORDER_DATE >= '2023-01-01 00:00:00' and oh.ORDER_DATE <= '2023-12-31 00:00:00';-->
+    <view-entity entity-name="A1Q09BopisOrderRevenue" package="co.hotwax.upreti">
+        <member-entity entity-alias="OH" entity-name="org.apache.ofbiz.order.order.OrderHeader"/>
+        <member-entity entity-alias="OI" entity-name="org.apache.ofbiz.order.order.OrderItem" join-from-alias="OH">
+            <key-map field-name="orderId"/>
+            <entity-condition>
+                <econdition entity-alias="OI" field-name="statusId" value="ITEM_COMPLETED"/>
+            </entity-condition>
+        </member-entity>
+        <member-entity entity-alias="OISG" entity-name="org.apache.ofbiz.order.order.OrderItemShipGroup" join-from-alias="OI">
+            <key-map field-name="orderId"/>
+            <key-map field-name="shipGroupSeqId"/>
+            <entity-condition>
+                <econdition entity-alias="OISG" field-name="shipmentMethodTypeId" value="STOREPICKUP"/>
+            </entity-condition>
+        </member-entity>
+        <member-entity entity-alias="OIA" entity-name="org.apache.ofbiz.order.order.OrderAdjustment" join-from-alias="OI" join-optional="true">
+            <key-map field-name="orderId"/>
+            <key-map field-name="orderItemSeqId"/>
+            <entity-condition>
+                <econdition field-name="orderAdjustmentTypeId" entity-alias="OIA" value="EXT_PROMO_ADJUSTMENT"/>
+            </entity-condition>
+        </member-entity> 
+        <alias name="totalOrders" entity-alias="OH" function="count-distinct" field="orderId" is-aggregate="true"/>
+        <alias name="totalRevenue" type="number-decimal" is-aggregate="true" function="sum">
+            <complex-alias>
+                <complex-alias operator="*">
+                    <complex-alias-field entity-alias="OI" field="quantity" default-value="0"/>
+                    <complex-alias-field entity-alias="OI" field="unitPrice" default-value="0"/>
+                </complex-alias>
+                <complex-alias-field entity-alias="OIA" field="amount" default-value="0"/>
+            </complex-alias>
+        </alias>
+        <entity-condition>
+            <econdition entity-alias="OH" field-name="statusId" value="ORDER_COMPLETED"/>
+        </entity-condition>
+    </view-entity>
+    <!--    query 10 - A1Q10CancelledOrders -->
+<!--    select count(*) from order_status os-->
+<!--    where os.STATUS_ID = 'ORDER_CANCELLED'-->
+<!--    and os.CHANGE_REASON is not null;-->
+    <view-entity entity-name="A1Q10CancelledOrders" package="co.hotwax.upreti">
+        <member-entity entity-alias="OS" entity-name="org.apache.ofbiz.order.order.OrderStatus">
+            <entity-condition>
+                <econdition field-name="statusId" entity-alias="OS" value="ORDER_CANCELLED"/>
+                <econdition field-name="changeReason" operator="is-not-null" />
+            </entity-condition>
+        </member-entity>
+        <alias name="statusCount" type="number-integer" function="count">
+            <complex-alias operator="*"/>
+<!--                <complex-alias-field entity-alias="" field=""-->
+<!--            </complex-alias>-->
+        </alias>
+    </view-entity>
+
+    <!--    query 12 - A1Q12CancelledOrders -->
+<!--    SELECT-->
+<!--    PRODUCT_ID, MINIMUM_STOCK AS 'THRESHOLD'-->
+<!--    FROM PRODUCT_FACILITY WHERE FACILITY_ID = 'CONFIGURATION';-->
+<view-entity entity-name="A1Q12CancelledOrders" package="co.hotwax.upreti">
+    <member-entity entity-alias="PF" entity-name="org.apache.ofbiz.product.facility.ProductFacility">
+        <entity-condition>
+            <econdition field-name="facilityId" value="CONFIGURATION"/>
+        </entity-condition>
+    </member-entity>
+
+</view-entity>
+
+
+</entities>
+<!-- <<==============================================X==============================================>> -->
+
+
+<!--        trainingId (Primary Key)-->
+<!--        trainingName (String)-->
+<!--        trainingDate (Date)-->
+<!--        trainingPrice (Decimal)-->
+<!--        trainingDuration (Integer - number of hours)-->
