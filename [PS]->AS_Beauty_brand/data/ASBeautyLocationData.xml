@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="ext-seed">
+
+    <!-- 1. POSTAL ADDRESSES -->
+    <org.apache.ofbiz.party.contact.ContactMech contactMechId="AS_BEAUTY_HQ_ADDR" contactMechTypeId="POSTAL_ADDRESS">
+        <org.apache.ofbiz.party.contact.PostalAddress 
+            toName="AS Beauty HQ" 
+            address1="123 Beauty Blvd" 
+            city="New York" 
+            postalCode="10001" 
+            countryGeoId="USA" 
+            stateProvinceGeoId="NY"/>
+    </org.apache.ofbiz.party.contact.ContactMech>
+
+    <org.apache.ofbiz.party.contact.ContactMech contactMechId="AS_BEAUTY_WH_ADDR" contactMechTypeId="POSTAL_ADDRESS">
+        <org.apache.ofbiz.party.contact.PostalAddress 
+            toName="AS Beauty Central Warehouse" 
+            address1="456 Logistics Lane" 
+            city="Edison" 
+            postalCode="08817" 
+            countryGeoId="USA" 
+            stateProvinceGeoId="NJ"/>
+    </org.apache.ofbiz.party.contact.ContactMech>
+
+    <!-- 2. TELECOM NUMBERS -->
+    <org.apache.ofbiz.party.contact.ContactMech contactMechId="AS_BEAUTY_PHONE" contactMechTypeId="TELECOM_NUMBER">
+        <org.apache.ofbiz.party.contact.TelecomNumber countryCode="1" areaCode="212" contactNumber="5551234"/>
+    </org.apache.ofbiz.party.contact.ContactMech>
+
+    <!-- 3. PARTY CONTACT MECH MAPPINGS -->
+    <org.apache.ofbiz.party.contact.PartyContactMech partyId="AS_BEAUTY" contactMechId="AS_BEAUTY_HQ_ADDR" fromDate="2026-01-01 00:00:00.0"/>
+    <org.apache.ofbiz.party.contact.PartyContactMechPurpose partyId="AS_BEAUTY" contactMechId="AS_BEAUTY_HQ_ADDR" contactMechPurposeTypeId="GENERAL_LOCATION" fromDate="2026-01-01 00:00:00.0"/>
+
+    <org.apache.ofbiz.party.contact.PartyContactMech partyId="AS_BEAUTY" contactMechId="AS_BEAUTY_PHONE" fromDate="2026-01-01 00:00:00.0"/>
+    <org.apache.ofbiz.party.contact.PartyContactMechPurpose partyId="AS_BEAUTY" contactMechId="AS_BEAUTY_PHONE" contactMechPurposeTypeId="PRIMARY_PHONE" fromDate="2026-01-01 00:00:00.0"/>
+
+    <!-- 4. FACILITY CONTACT MECH MAPPINGS -->
+    <org.apache.ofbiz.product.facility.FacilityContactMech facilityId="AS_BEAUTY_WH" contactMechId="AS_BEAUTY_WH_ADDR" fromDate="2026-01-01 00:00:00.0"/>
+    <org.apache.ofbiz.product.facility.FacilityContactMechPurpose facilityId="AS_BEAUTY_WH" contactMechId="AS_BEAUTY_WH_ADDR" contactMechPurposeTypeId="SHIPPING_LOCATION" fromDate="2026-01-01 00:00:00.0"/>
+
+</entity-facade-xml>

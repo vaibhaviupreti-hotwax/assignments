@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/moqui-conf-3.xsd"
+        name="as-beauty-maarg" version="1.0.0">
+    <depends-on name="poorti"/>
+    <depends-on name="shopify-delivery"/>
+    <entity-facade>
+        <load-data>
+            <entity-facade-xml type="ext-seed" location="data/ASBeautySetupData.xml"/>
+            <entity-facade-xml type="ext-seed" location="data/ASBeautyLocationData.xml"/>
+            <entity-facade-xml type="ext-seed" location="data/ASBeautyProductData.xml"/>
+            <entity-facade-xml type="ext-seed" location="data/ASBeautyProductData_v2.xml"/>
+        </load-data>
+    </entity-facade>
+</component>

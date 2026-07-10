@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="ext-seed">
+    <!-- 1. COMPANY SETUP -->
+    <org.apache.ofbiz.party.party.Party partyId="AS_BEAUTY" partyTypeId="PARTY_GROUP">
+        <org.apache.ofbiz.party.party.PartyGroup groupName="AS Beauty Group"/>
+        <org.apache.ofbiz.party.party.PartyRole roleTypeId="INTERNAL_ORGANIZATIO"/>
+    </org.apache.ofbiz.party.party.Party>
+
+    <!-- 2. FACILITY (WAREHOUSE) -->
+    <org.apache.ofbiz.product.facility.Facility 
+        facilityId="AS_BEAUTY_WH" 
+        facilityTypeId="WAREHOUSE" 
+        facilityName="AS Beauty Central Warehouse"
+        ownerPartyId="AS_BEAUTY"
+        defaultInventoryItemTypeId="NON_SERIAL_INV_ITEM"/>
+
+    <!-- 2b. FACILITY GROUP MEMBERSHIPS -->
+    <org.apache.ofbiz.product.facility.FacilityGroupMember 
+        facilityId="AS_BEAUTY_WH" 
+        facilityGroupId="OMS_FULFILLMENT" 
+        fromDate="2026-01-01 00:00:00.0"/>
+    <org.apache.ofbiz.product.facility.FacilityGroupMember 
+        facilityId="AS_BEAUTY_WH" 
+        facilityGroupId="FAC_GRP" 
+        fromDate="2026-01-01 00:00:00.0"/>
+
+    <!-- 2c. FACILITY LOCATION (Default physical location) -->
+    <org.apache.ofbiz.product.facility.FacilityLocation 
+        facilityId="AS_BEAUTY_WH" 
+        locationSeqId="TLTLTLLL01"
+        areaId="A" 
+        aisleId="01" 
+        sectionId="01" 
+        levelId="01" 
+        positionId="01"/>
+
+    <!-- 3. OFBIZ PARALLEL-RUN SHIM -->
+    <org.apache.ofbiz.product.catalog.ProdCatalog 
+        prodCatalogId="DUMMY_CATALOG" 
+        catalogName="Dummy Catalog"/>
+    <org.apache.ofbiz.product.catalog.ProdCatalogCategory 
+        prodCatalogId="DUMMY_CATALOG" 
+        productCategoryId="BROWSE_ROOT" 
+        prodCatalogCategoryTypeId="PCCT_BROWSE_ROOT" 
+        fromDate="2026-01-01 00:00:00.0"/>
+
+    <!-- 3b. BRAND-SPECIFIC CATALOGS -->
+    <org.apache.ofbiz.product.catalog.ProdCatalog 
+        prodCatalogId="JULEP_CATALOG" 
+        catalogName="Julep Catalog"/>
+    <org.apache.ofbiz.product.catalog.ProdCatalogCategory 
+        prodCatalogId="JULEP_CATALOG" 
+        productCategoryId="BROWSE_ROOT" 
+        prodCatalogCategoryTypeId="PCCT_BROWSE_ROOT" 
+        fromDate="2026-01-01 00:00:00.0"/>
+
+    <org.apache.ofbiz.product.catalog.ProdCatalog 
+        prodCatalogId="LAURA_GELLER_CATALOG" 
+        catalogName="Laura Geller Catalog"/>
+    <org.apache.ofbiz.product.catalog.ProdCatalogCategory 
+        prodCatalogId="LAURA_GELLER_CATALOG" 
+        productCategoryId="BROWSE_ROOT" 
+        prodCatalogCategoryTypeId="PCCT_BROWSE_ROOT" 
+        fromDate="2026-01-01 00:00:00.0"/>
+
+    <org.apache.ofbiz.product.catalog.ProdCatalog 
+        prodCatalogId="BLISS_CATALOG" 
+        catalogName="Bliss Catalog"/>
+    <org.apache.ofbiz.product.catalog.ProdCatalogCategory 
+        prodCatalogId="BLISS_CATALOG" 
+        productCategoryId="BROWSE_ROOT" 
+        prodCatalogCategoryTypeId="PCCT_BROWSE_ROOT" 
+        fromDate="2026-01-01 00:00:00.0"/>
+
+    <!-- 4. BRAND STORE SETUP -->
+    <org.apache.ofbiz.product.store.ProductStore 
+        productStoreId="AS_BEAUTY_STORE" 
+        storeName="AS Beauty Official Store"
+        companyName="AS Beauty Group" 
+        payToPartyId="AS_BEAUTY" 
+        inventoryFacilityId="AS_BEAUTY_WH"
+        checkInventory="Y" 
+        reserveInventory="Y" 
+        requireInventory="Y"
+        defaultLocaleString="en_US"
+        defaultCurrencyUomId="USD" 
+        defaultSalesChannelEnumId="WEB_SALES_CHANNEL">
+
+        <org.apache.ofbiz.product.store.ProductStoreFacility 
+            facilityId="AS_BEAUTY_WH" 
+            fromDate="2026-01-01 00:00:00.0"/>
+
+        <!-- BRAND SPECIFIC SETTINGS -->
+        <org.apache.ofbiz.product.store.ProductStoreSetting 
+            settingTypeEnumId="UPDATE_PRODUCT_TYPE" 
+            settingValue="true"/>
+        <org.apache.ofbiz.product.store.ProductStoreSetting 
+            settingTypeEnumId="RATE_SHOPPING" 
+            settingValue="Y"/>
+
+        <org.apache.ofbiz.product.store.ProductStoreCatalog 
+            prodCatalogId="DUMMY_CATALOG" 
+            fromDate="2026-01-01 12:00:00.000" 
+            sequenceNum="1"/>
+        <org.apache.ofbiz.product.store.ProductStoreCatalog 
+            prodCatalogId="JULEP_CATALOG" 
+            fromDate="2026-01-01 12:00:00.000" 
+            sequenceNum="2"/>
+        <org.apache.ofbiz.product.store.ProductStoreCatalog 
+            prodCatalogId="LAURA_GELLER_CATALOG" 
+            fromDate="2026-01-01 12:00:00.000" 
+            sequenceNum="3"/>
+        <org.apache.ofbiz.product.store.ProductStoreCatalog 
+            prodCatalogId="BLISS_CATALOG" 
+            fromDate="2026-01-01 12:00:00.000" 
+            sequenceNum="4"/>
+    </org.apache.ofbiz.product.store.ProductStore>
+
+    <!-- 4b. SHIPMENT METHODS FOR STORE -->
+    <org.apache.ofbiz.product.store.ProductStoreShipmentMeth 
+        productStoreShipMethId="AS_BEAUTY_STANDARD" 
+        productStoreId="AS_BEAUTY_STORE" 
+        shipmentMethodTypeId="STANDARD" 
+        partyId="_NA_" 
+        roleTypeId="CARRIER"
+        sequenceNumber="1"/>
+    <org.apache.ofbiz.product.store.ProductStoreShipmentMeth 
+        productStoreShipMethId="AS_BEAUTY_NEXT_DAY" 
+        productStoreId="AS_BEAUTY_STORE" 
+        shipmentMethodTypeId="NEXT_DAY" 
+        partyId="_NA_" 
+        roleTypeId="CARRIER"
+        sequenceNumber="2"/>
+    <org.apache.ofbiz.product.store.ProductStoreShipmentMeth 
+        productStoreShipMethId="AS_BEAUTY_GROUND" 
+        productStoreId="AS_BEAUTY_STORE" 
+        shipmentMethodTypeId="GROUND" 
+        partyId="_NA_" 
+        roleTypeId="CARRIER"
+        sequenceNumber="3"/>
+
+    <!-- 5. SHOPIFY SHOPS (Mapped to Single ProductStore) -->
+    <co.hotwax.shopify.ShopifyShop 
+        shopId="JULEP_SHOP" 
+        productStoreId="AS_BEAUTY_STORE" 
+        name="Julep"
+        currency="USD"
+        countryCode="US"
+        weightUnit="lb"
+        isEnabled="Y"/>
+    <co.hotwax.shopify.ShopifyShop 
+        shopId="LAURA_GELLER_SHOP" 
+        productStoreId="AS_BEAUTY_STORE" 
+        name="Laura Geller"
+        currency="USD"
+        countryCode="US"
+        weightUnit="lb"
+        isEnabled="Y"/>
+    <co.hotwax.shopify.ShopifyShop 
+        shopId="BLISS_SHOP" 
+        productStoreId="AS_BEAUTY_STORE" 
+        name="Bliss"
+        currency="USD"
+        countryCode="US"
+        weightUnit="lb"
+        isEnabled="Y"/>
+
+    <!-- 6. INTEGRATION MAPPINGS -->
+    <co.hotwax.integration.IntegrationTypeMapping 
+        integrationTypeId="PS_SHP_MTHD" 
+        mappingKey="NEXT_DAY" 
+        mappingValue="Free Shipping Next Day"/>
+    <co.hotwax.integration.IntegrationTypeMapping 
+        integrationTypeId="PS_PMT_MTHD" 
+        mappingKey="EXT_SHOP_VISA" 
+        mappingValue="visa"/>
+
+    <!-- 6b. SHOPIFY SHOP TYPE MAPPINGS -->
+    <co.hotwax.shopify.ShopifyShopTypeMapping 
+        shopId="JULEP_SHOP" 
+        mappedKey="SHOPIFY_ORDER_ID" 
+        mappedTypeId="MKT_PLACE" 
+        mappedValue="JULEP"/>
+    <co.hotwax.shopify.ShopifyShopTypeMapping 
+        shopId="LAURA_GELLER_SHOP" 
+        mappedKey="SHOPIFY_ORDER_ID" 
+        mappedTypeId="MKT_PLACE" 
+        mappedValue="LAURA_GELLER"/>
+    <co.hotwax.shopify.ShopifyShopTypeMapping 
+        shopId="BLISS_SHOP" 
+        mappedKey="SHOPIFY_ORDER_ID" 
+        mappedTypeId="MKT_PLACE" 
+        mappedValue="BLISS"/>
+
+    <!-- 7. SERVICE JOBS -->
+    <!-- <moqui.service.job.ServiceJob 
+        jobName="ShopifyOrderSync_Julep" 
+        description="Pulls Shopify Orders for Julep" 
+        serviceName="co.hotwax.shopify.order.ShopifyOrderServices.sync#ShopifyOrders" 
+        cronExpression="0 0/15 * * * ?"/>
+    <moqui.service.job.ServiceJob 
+        jobName="ShopifyOrderSync_LauraGeller" 
+        description="Pulls Shopify Orders for Laura Geller" 
+        serviceName="co.hotwax.shopify.order.ShopifyOrderServices.sync#ShopifyOrders" 
+        cronExpression="0 0/15 * * * ?"/> -->
+</entity-facade-xml>
