@@ -37,7 +37,15 @@ CREATED_STAMP DATETIME
 # Field level Scenarios:
 - serviceName
 
-## SERVICE_NAME VARCHAR - `CRITICAL`
+## Field Name: "SERVICE_NAME"  [severity: `CRITICAL`]
 - A bad service name kills all lower priority jobs.
 - No row is created in `ServiceJobRun` entity for failed job runs.
 
+## Field Name: "TRANSACTION_TIMEOUT"  [severity: `CRITICAL`]
+- Explanation: If  we check "ServiceJob" entity field: "transactionTimeout", we find that the field value is set in the database and picked from database entity: "ServiceJob" whenever needed. But here is the catch, if the project owner or associate who wants to perform some job by running that service, and forgot to set the parameter value in "transactionTimeout" field, then the default value is taken, refer "ServiceCallJobImpl.groovy:153" => transactionTimeout = (serviceJob.transactionTimeout ?: 1800). The default time set is 30 minutes if left empty by a developer/associate which is applied to the entire service call transaction, it is a hardcoded value which may be a good time  to complete a service but may malperform for a service performing heavy tasks which takes more than 30 minutes to complete operatons. Also if the user has set time which is very less, this can also be a reason for transaction timeout. Therefore the transaction manager forcefully rolls back the entire service call when the deadline is crossed. But any sub-services that used `requireNewTransaction=true` have **already committed** — leaving data partially written with no rollback possible for those writes.
+
+### Scenarios: Changing values in "TRANSACTION_TIMEOUT" affects the workflow in certain ways:
+- Left empty → default 1800s (30 min) applies — may still timeout for very heavy jobs.
+- Set too low → timeout too soon for the job's actual duration.
+- Sub-service partial writes → requireNewTransaction=true sub-calls already committed before the parent TX rolled back.
+- Exception caught softly: After the rollback, the exception is caught softly at line 247–249 so the job doesn't crash the scheduler, It silently records hasError='Y' on the ServiceJobRun record. This means no alert fires automatically unless a topic is configured. This makes the partial-write data corruption invisible until someone manually checks Job Runs history.

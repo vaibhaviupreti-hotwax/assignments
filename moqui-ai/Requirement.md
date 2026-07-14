@@ -9,8 +9,8 @@
 
 ---
 
-# Goal : 
-## Step 1: To identify the critical entities, because not every entity contains equal weight. 
+## Goal : 
+### Step 1: To identify the critical entities, because not every entity contains equal weight. 
 - Sorting entities and categorizing them on the basis of what they govern. Following:
 - Integration/remote-connection config (e.g. `SystemMessageRemote`)
 - System-wide behavior toggles (e.g. `SystemProperty`)
@@ -20,7 +20,7 @@
 Example:
 - Integration entity needs field by field review.
 
-## Step 2: Identifying fields
+### Step 2: Identifying fields
 - A. Does this field control connectivity(URLs, creds)/auth(keys,secret)/identity(PK)?
 - B. How runtime behaviour is related? (flag:enabled/disabled) - changes the workflow: system's execution path, logic, or processing state. 
 - Path Selection: It determines which code branches execute.
@@ -30,9 +30,14 @@ Example:
 [A and B refers critical fields]
 
 ---
-# Entities identified as critical entities 
+## Entities identified as critical entities 
 - Definition of critical entities: Entities that can affect the workflow, when changes are done. 
-
+[TO BE ADDED...]
+- ...
+- ...
+- ...
 ---
+## Controlled Configuration Change Approval Flow
+- Architecture for controlled configuration changes where modifications to critical entities are intercepted, staged, evaluated, and only then committed to the database.
 ![alt text](<Untitled design (2).png>)
 ---
