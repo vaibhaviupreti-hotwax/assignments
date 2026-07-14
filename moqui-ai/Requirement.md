@@ -32,3 +32,7 @@ Example:
 ---
 # Entities identified as critical entities 
 - Definition of critical entities: Entities that can affect the workflow, when changes are done. 
+
+---
+![alt text](<Untitled design (2).png>)
+---
