@@ -10,8 +10,10 @@
 # Jul 13, 2026 [Added files from google doc]
 - revisited the reqirement - drew a flochart and checked expected requirements again.
 ## todos:
-- To take any service job - write down xml data (service and params for it).
+- Added: "ServiceJobDataVisualization.xml"
+[To take any service job - write down xml data (service and params for it).]
 - For a service job entity - I need to list down fields and create scenarios from field values: on what could happen if there is a diff/update in that parameter.
+
 
 
 
