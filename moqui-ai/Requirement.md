@@ -39,8 +39,7 @@ Example:
 ---
 ## Controlled Configuration Change Approval Flow
 - Architecture for controlled configuration changes where modifications to critical entities are intercepted, staged, evaluated, and only then committed to the database.
-
-![Config Change Approval Flow](moqui-ai/config-change-approval-flow.png)
+![Config Change Approval Flow](config-change-approval-flow.png)
 ---
 ## Findings: JSON payload.
 - I checked the job manager app to check how the payload is created and sent to the backend.
