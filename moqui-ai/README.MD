@@ -14,8 +14,9 @@
 - For a service job entity - I need to list down fields and create scenarios from field values: on what could happen if there is a diff/update in that parameter.
 ---
 # Jul 14, 2026 
-- Added use case for field - "transactionTimeout".
-
+- Added use case for field - "TRANSACTION_TIMEOUT".
+- Added use case for field - "MIN_RETRY_TIME".
+- Added use case for field - "CRON_EXPRESSION".
 
 
 
