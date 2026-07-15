@@ -108,18 +108,130 @@ store.updateJob({
   "riskLevel": "HIGH"
 }
 ```
+---
+## What it looks like?
+Here, the front end is sending data from a GET request (old params) and a PUT request (updated payload/JSON).
+### Initial payload
+```js
+{
+  jobName: "approve_rejectedItemsCycleCount",
+  description: "desc",
+  cronExpression: "0 0 * * *",
+  paused: "N",
+  serviceJobParameters: 
+[
+{
+    "jobName": "approve_rejectedItemsCycleCount",
+    "lastUpdatedStamp": "2026-04-28T09:27:11+0000",
+    "parameterName": "countTypeEnumId",
+    "parameterValue": "REJ_ITEM_COUNT",
+    "createdStamp": "2026-04-28T09:27:11+0000",
+    "_entity": "moqui.service.job.ServiceJobParameter"
+},
+{
+    "jobName": "approve_rejectedItemsCycleCount",
+    "lastUpdatedStamp": "2026-04-28T09:27:11+0000",
+    "parameterName": "productStoreId",
+    "createdStamp": "2026-04-28T09:27:11+0000",
+    "_entity": "moqui.service.job.ServiceJobParameter"
+}
+]
+}
+```
+### updated payload [USER-1]
+```js
+{
+  jobName: "approve_rejectedItemsCycleCount",
+  description: "updated desc",    //noncritical
+  cronExpression: "0 2 * * *",    // critical
+  paused: "N",
+  serviceJobParameters: 
+[
+{
+    "jobName": "approve_rejectedItemsCycleCount",
+    "lastUpdatedStamp": "2026-04-28T09:27:11+0000",
+    "parameterName": "countTypeEnumId",
+    "parameterValue": "REJ_ITEM_COUNT",
+    "createdStamp": "2026-04-28T09:27:11+0000",
+    "_entity": "moqui.service.job.ServiceJobParameter"
+},
+{
+    "jobName": "approve_rejectedItemsCycleCount",
+    "lastUpdatedStamp": "2026-04-28T09:27:11+0000",
+    "parameterName": "productStoreId",
+    "createdStamp": "2026-04-28T09:27:11+0000",
+    "_entity": "moqui.service.job.ServiceJobParameter"
+}
+]
+}
+```
+### Diff - stored as JSON in an entity
+```js
+[
+ {
+ {
+    "changedEntityName": "moqui.service.job.ServiceJob",
+    "fieldName": "description",
+    "currentValue": "desc",
+    "proposedValue": "updated desc",
+    "changeType": "UPDATE",
+    "logSeqId": "01"
+  }
+}
+serviceJobParameters: []
+]
+```
+---
+### updated payload [USER-2]
+```js
+{
+  jobName: "approve_rejectedItemsCycleCount",
+  description: "updated desc",    
+  cronExpression: "0 2 * * *",    // critical
+  paused: "N",
+  serviceJobParameters: 
+[
+{
+    "jobName": "approve_rejectedItemsCycleCount",
+    "lastUpdatedStamp": "2026-04-28T09:27:11+0000",
+    "parameterName": "countTypeEnumId",
+    "parameterValue": "REJ_ITEM_COUNT",
+    "createdStamp": "2026-04-28T09:27:11+0000",
+    "_entity": "moqui.service.job.ServiceJobParameter"
+},
+{
+    "jobName": "approve_rejectedItemsCycleCount",
+    "lastUpdatedStamp": "2026-04-28T09:27:11+0000",
+    "parameterName": "productStoreId",
+    "createdStamp": "2026-04-28T09:27:11+0000",
+    "_entity": "moqui.service.job.ServiceJobParameter"
+}
+]
+}
+```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+### Diff - stored as JSON in an entity
+```js
+[
+ {
+ {
+    "changedEntityName": "moqui.service.job.ServiceJob",
+    "fieldName": "cronExpression",
+    "currentValue": "0 0 * * *",
+    "proposedValue": "0 2 * * *",
+    "changeType": "UPDATE",
+    "logSeqId": "01"
+  }
+}
+serviceJobParameters: [
+ {
+ "parameterName": "countTypeEnumId",
+    "changedFieldName": "parameterName",
+    "currentValue": REJ_ITEM_COUNT,
+    "proposedValue": "REJ_ITEM_COUNT_CHNG",  // PASSED AN INVALID CHANGE-validated
+    "changeType": "ADD",
+    "logSeqId": "02"
+}
+]
+]
+```
