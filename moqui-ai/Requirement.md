@@ -41,3 +41,85 @@ Example:
 - Architecture for controlled configuration changes where modifications to critical entities are intercepted, staged, evaluated, and only then committed to the database.
 ![alt text](<Untitled design (2).png>)
 ---
+## Jul 14,2026 findings: JSON payload.
+- I checked the job manager app to check how the payload is created and sent to the backend.
+- There is a shared api :
+  ```js
+  async updateJob(payload: any) {
+      return await api({
+        url: `admin/serviceJobs/${payload.jobName}`,
+        method: "PUT",
+        data: payload,
+      });
+    },
+  ```
+- URL path: admin/serviceJobs/<jobName>
+- Method: PUT
+- Body: the full payload object, serialized as JSON
+- Headers: authorization + Content-Type: application/json
+---
+- The Caller method invokes the api and passes the job name with the api endpoint, and this method does not perform any operation; rather, it passes the payload(body) straightaway to the backend.
+- NOTE: Here is the place where we need to apply validity checks and make decision to pass the payload JSON to the backend or to create a task of it and pass the JSON - diff to a staging area/ we call it an Entity group here (one Entity for service job changes and one for service job parameter changes) 
+- But if the caller passes:
+```js
+store.updateJob({
+  jobName: "myJob",
+  description: "desc",
+  cronExpression: "0 0 * * *",
+  paused: "N",
+  serviceJobParameters: [...]
+});
+```
+- In the above case, the backend receives all of those fields
+
+## STAGE FIRST, APPROVE LATER..
+### Some points to keep in mind while designing the architecture:
+- Initially identify "Critical Entities" and "Low Risk Entities".
+- Changes to Job configuration should not be applied immediately (hold/create a task/staging area).
+- There should be a need for approval for the risky changes.
+- There should be a proper flow to keep the status, to maintain the flow of review/reject/approve.
+- Change types should be handled separately: "Configuration changes" (ex: Edit) and "Runtime action" (ex: start/stop).
+- Rules should be made on a risk basis, not an entity-based. Risk can be further classified as High risk, Medium Risk, and low risk.
+- The staging area should contain [requestedBy, change, beforeValue, afterValue, approvalState, auditTrail]. I found an entity that resembles and can be referred to for this purpose: "EntityAuditLog" entity.
+- There should be runtime diff check rather than entity based (this is static and if multiple users are requesting change then there will be a new problem to decide the priority for the change, "Who will get the priority? problem.")
+  
+### Example staging JSON:
+```json
+{
+  "requestType": "SERVICE_JOB_UPDATE",
+  "target": {
+    "entity": "serviceJob",
+    "jobName": "myJob"
+  },
+  "changes": [
+    {
+      "field": "cronExpression",
+      "before": "0 0 * * *",
+      "after": "0 12 * * *"
+    },
+    {
+      "field": "paused",
+      "before": "N",
+      "after": "Y"
+    }
+  ],
+  "requestedBy": "user123",
+  "reason": "schedule update",
+  "riskLevel": "HIGH"
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
