@@ -41,7 +41,7 @@ Example:
 - Architecture for controlled configuration changes where modifications to critical entities are intercepted, staged, evaluated, and only then committed to the database.
 ![alt text](<Untitled design (2).png>)
 ---
-## Jul 14,2026 findings: JSON payload.
+## Findings: JSON payload.
 - I checked the job manager app to check how the payload is created and sent to the backend.
 - There is a shared api :
   ```js
