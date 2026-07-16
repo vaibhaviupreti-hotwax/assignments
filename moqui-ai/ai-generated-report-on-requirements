@@ -1,0 +1,482 @@
+# Design Review: `ServiceJobEditAppl` Approval Workflow
+
+**Author Review:** Antigravity  
+**Date:** 2026-07-16  
+**Conversation:** `acad86af`  
+**Subject:** Is the proposed `ServiceJobEditAppl` + `approve#request` wrapper flow the optimal solution?
+
+---
+
+## 1. Executive Summary
+
+The proposed design is **architecturally sound and correctly identifies the right pattern** — a staging/holding entity that intercepts a mutating operation and gates it behind an approval state machine. The mental model is correct, the motivation is strong (backed by the 15 documented scenarios where an ungated edit to `ServiceJob` causes silent cluster-wide failures or security bypasses), and the flow is coherent end to end.
+
+However, there are **six specific issues** in the current design — one is a critical naming/scope mismatch, two are gaps that would make the system incomplete, and three are design quality concerns that will cause friction in implementation and maintenance. These are enumerated below with specific corrections.
+
+**Verdict:** ✅ **Correct direction. Needs targeted refinement before implementation.**
+
+---
+
+## 2. Background — Why This Is Necessary (The Risk Evidence)
+
+From prior code-tracing work (conversations `c8323e8c` and `da0b6797`), the absence of any edit gate on `ServiceJob` has 15 documented blast scenarios. The three most critical that directly justify the approval requirement:
+
+| Scenario | Field | Impact |
+|---|---|---|
+| #1 | `serviceName` typo | Kills **all lower-priority jobs** cluster-wide, every tick, silently |
+| #6 | `serviceName` → privileged service | Runs **any service with `disableAuthz()`** — complete authz bypass |
+| #4 | `expireLockTime=1` | **Duplicate concurrent writes** to orders/inventory |
+| #2 | `cronExpression` (5-field instead of 6) | Job silently never fires again |
+| #13 | Clear `permissionGroupId` | Removes the **only** per-job permission gate |
+
+The guardrail gap table confirmed that **the Tools admin screen and the `POST /serviceJobs` REST path have zero validation** — they call raw `update#moqui.service.job.ServiceJob` entity-auto directly, bypassing the one service (`JobServices.update#ServiceJob`) that does any validation at all. An approval gate is the correct architectural fix.
+
+---
+
+## 3. Proposed Flow — Structural Walkthrough
+
+```
+User (developer/associate)
+  │
+  ├─ [submits change] → PUT /serviceJobs/{jobName}
+  │                      POST /serviceJobs
+  │                      (or any other "update" API endpoint)
+  │
+  ▼
+Backend Service (intercepting layer)
+  │
+  ├─ Does NOT call update#moqui.service.job.ServiceJob directly
+  │
+  ├─ Instead: creates ServiceJobEditAppl record {
+  │     applicationData: <JSON payload of proposed changes>,
+  │     action: "updateServiceJob",
+  │     actionType: <points to HTML artifact/template>,
+  │     applicationDateTime: now,
+  │     createdDateTime: now,
+  │     statusId: "PENDING",
+  │     requestedByUserId: currentUser,
+  │     approvedByUserId: null
+  │   }
+  │
+  ├─ Sends email notification to Account Manager with review link
+  │
+  ▼
+Reviewer Dashboard (HTML artifact)
+  │
+  ├─ Loads ServiceJobEditAppl by ApplicationRequestId (PK)
+  ├─ Calls 2 APIs:
+  │   ├─ [GET] current live state of the ServiceJob entity
+  │   └─ [GET] applicationData JSON from ServiceJobEditAppl
+  ├─ Renders side-by-side JSON diff
+  │
+  ├─ Reviewer clicks Approve / Reject
+  │
+  ▼
+Backend: approve#request wrapper service
+  │
+  ├─ Input: ApplicationRequestId
+  ├─ Fetches: applicationData + action from ServiceJobEditAppl
+  ├─ Calls: update#ServiceJob (the actual DB-persisting service)
+  ├─ Updates: ServiceJobEditAppl.statusId → "APPROVED" / "REJECTED"
+  └─ (Optional) Notifies requester of decision
+```
+
+This flow is **correct in structure**. The pattern maps 1:1 to `AiToolCallRequest` from `moqui-ai` — a proven HITL gate pattern already present in this codebase.
+
+---
+
+## 4. Entity Design Analysis
+
+### 4.1 Proposed Fields
+
+```
+ServiceJobEditAppl
+├── applicationEditApplId (PK — implied, not explicitly named)
+├── applicationData       (JSON blob — the proposed changes)
+├── action                (string — what operation to perform)
+├── actionType            (string — points to HTML artifact)
+├── applicationDateTime   (timestamp — when change was submitted)
+├── createdDateTime       (timestamp — record creation)
+├── statusId              (PENDING / APPROVED / REJECTED)
+├── requestedByUserId     (FK → UserAccount)
+└── approvedByUserId      (FK → UserAccount)
+```
+
+### 4.2 Issues Found
+
+#### ❌ Issue 1 — CRITICAL: Missing `targetEntityName` and `targetPrimaryKey`
+
+**Problem:** `applicationData` is a JSON blob, but there is no field that records *which entity and which record* this approval request is targeting. If a reviewer opens the dashboard or if `approve#request` runs, it must know: "This is for `ServiceJob` record with `jobName=approve_rejectedItemsCycleCount_STORE`."
+
+Without this, the `approve#request` service has no way to know *where* to apply the `applicationData` payload. It would have to parse the `applicationData` JSON to find the PK — coupling the approval logic to the payload structure of every supported entity.
+
+**Fix:** Add explicit fields:
+```xml
+<field name="targetEntityName" type="text-medium"/>
+<!-- e.g. "moqui.service.job.ServiceJob" -->
+
+<field name="targetPrimaryKey" type="text-medium"/>
+<!-- e.g. "approve_rejectedItemsCycleCount_STORE" (serialized as JSON for compound PKs) -->
+```
+
+This is how `AiToolCallRequest` handles it — `toolName` is the action, `arguments` is the payload, and the AI agent's context provides the resolution target. Here, the target must be explicit.
+
+---
+
+#### ❌ Issue 2 — SIGNIFICANT: `action` vs `actionType` — Ambiguous Naming
+
+**Problem:** Both `action` and `actionType` appear to encode "what to do," but their distinction is unclear:
+- `action` — described as "what operation" (e.g. `updateServiceJob`, `pauseServiceJob`)
+- `actionType` — described as "points to an HTML artifact"
+
+These are two different concerns conflated into similar names. `actionType` as a pointer to an HTML template is essentially a **UI routing key**, not a data field about the approval intent.
+
+**Fix:**
+- Rename `action` → `operationType` (e.g. `UPDATE_SERVICE_JOB`, `PAUSE_SERVICE_JOB`, `UPDATE_PARAMETERS`)
+- Rename `actionType` → `reviewScreenLocation` or eliminate it if the screen is determined by `targetEntityName`
+
+The reviewer screen template should be resolved by `targetEntityName` + `operationType`, not by a stored HTML path in the database (which would break on deployments where paths differ).
+
+---
+
+#### ⚠️ Issue 3 — GAP: No `decisionDateTime` and No `decisionNote`
+
+**Problem:** When an approver clicks Reject, there is no field to record:
+1. *When* the decision was made
+2. *Why* it was rejected (note/comment)
+
+This matters for the stated requirement: *"If rejected, the change is discarded, and the subordinate developer may be notified of the rejection."* — you cannot send a useful rejection notification without a reason.
+
+**Fix:** Add:
+```xml
+<field name="decisionDateTime" type="date-time"/>
+<field name="decisionNote"     type="text-long"/>
+```
+
+---
+
+#### ⚠️ Issue 4 — GAP: `applicationData` Must Store BOTH Old and New State
+
+**Problem:** The current design stores only the **proposed new state** in `applicationData`. The reviewer dashboard needs two JSONs (stated in your design: "show 2 JSONs and their diff"). This means the old state must be fetched live from the entity at review time.
+
+This is fragile: if the live entity changes *between* the time of the request and the time of review, the "old state" shown on the diff screen will no longer match what was there when the request was made.
+
+**Recommendation:** At request creation time, snapshot both states:
+```json
+{
+  "currentState": { ...live ServiceJob fields at time of request... },
+  "proposedState": { ...user's submitted changes... }
+}
+```
+This makes the approval record self-contained and auditable even after the live entity changes.
+
+---
+
+#### ⚠️ Issue 5 — DESIGN QUALITY: `applicationDateTime` vs `createdDateTime` — Redundant
+
+**Problem:** Two timestamp fields serve the same purpose. "When was this application submitted?" and "When was the record created?" are the same event in this flow.
+
+**Fix:** Keep only `createdDateTime` (rename to `requestedDateTime` for clarity). Use this one field. If you need to track *when the change would take effect* (a scheduled future change), keep `applicationDateTime` with a clear description: "The datetime this change is intended to go live (may be null for immediate application post-approval)."
+
+---
+
+#### ℹ️ Issue 6 — SCOPE CONCERN: Entity Name `ServiceJobEditAppl` Is Too Narrow
+
+**Problem:** Your design document explicitly states: *"the request is not limited to service jobs, it could be any entity and different nesting levels."* But the entity is named `ServiceJobEditAppl`.
+
+If you implement `ServiceJobParameter` changes, `paused` status changes, or eventually other OMS entities (e.g. `ProductStore`, `SystemMessage`), you will either:
+- Reuse this entity with confusing semantics, or
+- Create `ProductStoreEditAppl`, `SystemMessageEditAppl` — a proliferation of identical staging tables
+
+**Fix (two options):**
+
+| Option | Entity Name | Trade-off |
+|---|---|---|
+| **A — Generic** | `EntityChangeRequest` | More reusable, slightly more abstract naming |
+| **B — Domain-scoped** | `ConfigChangeRequest` | Scoped to configuration-class entities, still general enough |
+
+`AiToolCallRequest` chose Option A's spirit — it's generic across all AI tool types, not one per tool. Follow the same pattern.
+
+---
+
+## 5. Flow Correctness Analysis
+
+### 5.1 Interception Point — Where Does the Gate Live?
+
+**Your design:** The frontend sends a PUT/POST. The backend receives it and "saves to `ServiceJobEditAppl` instead of persisting."
+
+**Critical gap:** This requires the intercepting service to be called by ALL edit paths, including:
+1. `PUT /serviceJobs/{jobName}` → `JobServices.update#ServiceJob` ✅ (this service exists and could be modified)
+2. `POST /serviceJobs` → `admin.rest.xml` → raw `create#moqui.service.job.ServiceJob` entity-auto ❌ (no service layer here)
+3. Tools Admin Screen → `ServiceJobDetail.xml` → raw `update#moqui.service.job.ServiceJob` entity-auto ❌ (no service layer here)
+
+From the guardrail gap table (Scenarios 1-15), paths 2 and 3 **bypass every service layer entirely**. Your approval gate will only work if you also close these bypass paths — otherwise a developer can submit changes through path 1 (triggering the gate) and a Tools admin can push the same change directly via path 3 (bypassing it completely).
+
+**Required action:** The gate must be enforced at the entity level (via Moqui's `ECA` entity condition/action rules) OR all edit paths must be funneled through a single gated service. The `approve#request` wrapper alone is not sufficient if the raw entity-auto paths remain open.
+
+---
+
+### 5.2 The `approve#request` Wrapper — Design Assessment
+
+**What you described:**
+```
+approve#request(applicationRequestId)
+  → fetches applicationData + action from ServiceJobEditAppl
+  → calls update#ServiceJob(applicationData)
+  → updates ServiceJobEditAppl.statusId = "APPROVED"
+```
+
+**Assessment:** This is correct and the right pattern. One additional concern:
+
+**Transactionality:** The call to `update#ServiceJob` and the status update to `ServiceJobEditAppl` must be in the **same transaction**. If `update#ServiceJob` succeeds but the status update fails (or vice versa), the system will be in an inconsistent state — either the change is applied but the record still shows `PENDING`, or the record shows `APPROVED` but the change never persisted. Use `requireNewTransaction=false` (same TX) for both operations inside `approve#request`.
+
+---
+
+### 5.3 Notification Flow — Assessment
+
+**Stated flow:** After `ServiceJobEditAppl` is created → email sent to Account Manager → AM clicks link → opens reviewer dashboard.
+
+**What's missing:**
+1. **Who is the Account Manager?** There must be a resolution strategy: is it a fixed system user? Is it derived from `permissionGroupId` on the `ServiceJob`? Is it configured per-job in `ServiceJobUser`? This must be explicitly defined — the email cannot go to "the account manager" without knowing how to look them up.
+
+2. **What happens if the AM is on leave / unavailable?** There is no timeout or escalation path defined. A `PENDING` request with no expiry could block changes indefinitely.
+
+3. **Rejection notification path:** Stated requirement says subordinate developers "may be notified." The `requestedByUserId` is available, so this is straightforward — but it must be explicitly wired in the `reject` path of `approve#request`.
+
+---
+
+### 5.4 Reviewer Dashboard — Assessment
+
+**Your design:** HTML artifact that:
+1. Calls GET for live entity state
+2. Reads `applicationData` from `ServiceJobEditAppl`
+3. Renders side-by-side JSON + diff
+4. Has Approve/Reject buttons
+
+**Assessment:** This is solid. Two notes:
+
+1. **Recommendation from Issue 4:** If you snapshot `currentState` in `applicationData`, the first API call (live entity GET) is only needed to show current state *after* the request was filed — still useful for showing if anything else changed since. Store the snapshot, still fetch live for comparison.
+
+2. **The diff must handle `ServiceJobParameter` rows, not just `ServiceJob` fields.** The proposed change payload (`applicationData`) may include both the parent `ServiceJob` fields AND child `ServiceJobParameter` rows. The diff renderer must handle nested/array structures. A flat JSON diff is insufficient.
+
+---
+
+## 6. Gap Summary Table
+
+| # | Gap | Severity | Fix |
+|---|---|---|---|
+| G1 | No `targetEntityName` / `targetPrimaryKey` fields | 🔴 Critical | Add two explicit fields to the entity |
+| G2 | `action` vs `actionType` naming is ambiguous | 🟡 Significant | Rename to `operationType` + `reviewScreenLocation` |
+| G3 | No `decisionDateTime` / `decisionNote` | 🟡 Significant | Add two fields |
+| G4 | `applicationData` stores only proposed state | 🟡 Significant | Snapshot both `currentState` + `proposedState` at request time |
+| G5 | `applicationDateTime` = `createdDateTime` — redundant | 🟢 Minor | Merge into one field |
+| G6 | Entity name is too narrow for stated scope | 🟡 Significant | Rename to `EntityChangeRequest` or `ConfigChangeRequest` |
+| G7 | Bypass paths (Tools admin, POST endpoint) not closed | 🔴 Critical | Gate must be enforced via ECA or funnel all paths |
+| G8 | Account Manager resolution strategy not defined | 🟡 Significant | Define lookup: `ServiceJobUser`? `permissionGroupId`? Fixed config? |
+| G9 | No timeout / escalation on `PENDING` requests | 🟢 Minor | Define SLA; add expiry or escalation job |
+| G10 | `approve#request` TX boundary not specified | 🟡 Significant | Ensure status update + entity update are in same TX |
+| G11 | Diff renderer must handle nested `ServiceJobParameter` | 🟢 Minor | Build renderer for nested/array structures |
+
+---
+
+## 7. Corrected Entity Definition (Recommended)
+
+```xml
+<!-- Generic config change staging entity -->
+<entity entity-name="ConfigChangeRequest" package="co.hotwax.oms">
+    <description>Staging entity for configuration changes requiring human approval.
+    Modeled after AiToolCallRequest. A record is created instead of applying
+    the change directly; it transitions PENDING → APPROVED/REJECTED.</description>
+
+    <!-- Identity -->
+    <field name="changeRequestId"   type="id"          is-pk="true"/>
+
+    <!-- What is being changed -->
+    <field name="targetEntityName"  type="text-medium"/>
+    <!-- e.g. "moqui.service.job.ServiceJob" -->
+    <field name="targetPrimaryKey"  type="text-medium"/>
+    <!-- e.g. "approve_rejectedItemsCycleCount_STORE" (JSON for compound PKs) -->
+    <field name="operationType"     type="text-medium"/>
+    <!-- e.g. "UPDATE_SERVICE_JOB", "PAUSE_SERVICE_JOB", "UPDATE_PARAMETERS" -->
+
+    <!-- The payload — both states captured at request time -->
+    <field name="applicationData"   type="text-very-long"/>
+    <!-- JSON: { "currentState": {...}, "proposedState": {...} } -->
+
+    <!-- Timestamps -->
+    <field name="requestedDateTime" type="date-time"/>
+    <field name="decisionDateTime"  type="date-time"/>
+
+    <!-- Participants -->
+    <field name="requestedByUserId" type="id-long"/>
+    <field name="approvedByUserId"  type="id-long"/>   <!-- null until decision -->
+
+    <!-- State machine -->
+    <field name="statusId"          type="id"/>
+    <!-- PENDING, APPROVED, REJECTED -->
+
+    <!-- Decision context -->
+    <field name="decisionNote"      type="text-long"/>
+
+    <!-- UI routing (optional — can be derived from targetEntityName + operationType) -->
+    <field name="reviewScreenPath"  type="text-medium"/>
+
+    <!-- Relationships -->
+    <relationship type="one" related="moqui.security.UserAccount"
+                  fk-name="CCR_REQ_USER"  field-map="requestedByUserId:userId"/>
+    <relationship type="one" related="moqui.security.UserAccount"
+                  fk-name="CCR_APR_USER"  field-map="approvedByUserId:userId"/>
+    <relationship type="one" related="moqui.basic.StatusItem" fk-name="CCR_STATUS"/>
+</entity>
+```
+
+---
+
+## 8. Is This the Optimal Solution?
+
+### What is "optimal" for this requirement?
+
+The requirement is:
+> *"Any change to a service job must be reviewed before it takes effect. The change must not apply immediately. An approval gate is required."*
+
+**Evaluated against four criteria:**
+
+| Criterion | Assessment |
+|---|---|
+| **Correctness** | ✅ Yes — staging entity pattern is provably correct for this problem |
+| **Reusability** | ⚠️ Partial — entity name is too narrow; with rename, becomes fully reusable |
+| **Framework alignment** | ✅ Yes — directly mirrors `AiToolCallRequest` HITL pattern already in this codebase |
+| **Completeness** | ❌ No — bypass paths are not closed; AM resolution is undefined |
+
+### Is there a simpler / better alternative?
+
+Two alternatives were considered and rejected:
+
+1. **Moqui Entity Audit Log** — only logs *after* the change is committed. Cannot gate the change. Not suitable.
+2. **Row-level locking / entity versioning** — prevents concurrent writes but does not introduce a human approval step. Not suitable.
+
+3. **ECA (Entity Condition/Action) rules at the framework level** — could intercept `create#` / `update#` calls to `ServiceJob` before they hit the DB, then redirect to the staging entity. This is a **viable complement** to the proposed service-layer approach and solves gap G7 (bypass paths) elegantly. Consider combining both: service-layer gate for the primary REST path + ECA gate to catch the admin screen bypass.
+
+**The proposed approach is the optimal pattern.** The gaps identified are implementation-level specifics that must be resolved before coding begins, not architectural flaws that would require a fundamentally different approach.
+
+---
+
+## 9. Recommended Implementation Order
+
+```
+Phase 1 — Entity & Status Data
+  [x] Define ConfigChangeRequest entity (with all corrected fields)
+  [x] Define StatusItem seed data: PENDING, APPROVED, REJECTED
+
+Phase 2 — Interception Layer
+  [x] Modify JobServices.update#ServiceJob to write ConfigChangeRequest instead of updating ServiceJob
+  [x] Add ECA rule on ServiceJob entity to catch admin-screen bypass
+  [x] Close the POST /serviceJobs raw entity-auto path
+
+Phase 3 — Notification
+  [x] Implement AM resolution logic (define lookup strategy first)
+  [x] Send email with review link after ConfigChangeRequest creation
+
+Phase 4 — Reviewer Dashboard
+  [x] HTML artifact: load both states, render side-by-side diff (handle nested ServiceJobParameter)
+  [x] Approve / Reject buttons → call approve#configChangeRequest service
+
+Phase 5 — Approval Execution
+  [x] approve#configChangeRequest:
+       fetch applicationData + operationType → call target service → update statusId (same TX)
+  [x] Rejection notification to requestedByUserId
+
+Phase 6 — Operational Safety
+  [x] Add a scheduled job to alert on PENDING requests older than N hours (escalation)
+```
+
+---
+
+## 10. Final Verdict
+
+| Dimension | Score | Notes |
+|---|---|---|
+| Core pattern correctness | ✅ 9/10 | Correct HITL staging pattern; mirrors existing `AiToolCallRequest` |
+| Entity design quality | ⚠️ 6/10 | Missing PK target fields, redundant timestamps, ambiguous naming |
+| Flow completeness | ⚠️ 6/10 | Bypass paths not addressed, AM resolution undefined |
+| Requirement coverage | ✅ 8/10 | Covers approve/reject, notification, deferred persistence — missing escalation |
+| Framework alignment | ✅ 9/10 | Directly extends proven codebase patterns |
+
+**Overall: Solid foundation, 6 specific corrections required before implementation.**
+The solution direction is correct and optimal for the stated requirement. The gaps documented above are pre-implementation clarifications, not architectural blockers.
+---
+# MORE TO READ
+Listed directory knowledge
+Listed directory moqui-framework
+Listed directory a9433467-35df-4e03-9ae8-41f164a05c03
+Listed directory c8323e8c-1f30-45c1-9866-b9e9181cde8c
+Viewed overview.txt:1-20
+Viewed servicejob_scenarios.md:1-107
+
+Now I have deep context from past conversations. Let me also check the `ServiceJob` entity and the relevant services to complete my analysis before writing the report.
+
+Viewed servicejob_remaining_fields.md:1-194
+Searched for "ServiceJob"
+
+I now have very deep context. Let me write the comprehensive report.
+
+Created ServiceJobEditAppl_design_review.md
+
+Here is the full report summary.
+
+---
+
+## Design Review: `ServiceJobEditAppl` Approval Workflow
+
+### Verdict: ✅ Correct Direction — 6 Targeted Corrections Required
+
+The core pattern is **right and optimal** for the stated requirement. It directly mirrors the `AiToolCallRequest` HITL pattern already proven in this codebase. The motivation is backed by 15 documented scenarios where ungated edits to `ServiceJob` cause silent cluster-wide failures, duplicate writes, or complete authz bypass (e.g. Scenario #6: changing `serviceName` to a privileged service runs it under `disableAuthz()`).
+
+---
+
+### The 6 Issues Found
+
+| # | Issue | Severity |
+|---|---|---|
+| **G1** | No `targetEntityName` / `targetPrimaryKey` fields — `approve#request` has no way to know *which record* to update without parsing the JSON payload | 🔴 Critical |
+| **G7** | Bypass paths not closed — Tools Admin Screen and `POST /serviceJobs` call raw `update#moqui.service.job.ServiceJob` entity-auto directly, completely skipping your gate | 🔴 Critical |
+| **G4** | `applicationData` stores only the *proposed* state. The diff dashboard fetches live state at review time — but if the live record changed between request and review, the "before" shown is wrong. Snapshot both `currentState` + `proposedState` at request creation time. | 🟡 Significant |
+| **G8** | Account Manager resolution is undefined — the email says "send to AM" but there is no defined lookup: Is it from `ServiceJobUser`? From `permissionGroupId`? A fixed config? This must be decided before coding. | 🟡 Significant |
+| **G10** | `approve#request` TX boundary — the entity update and the status update to `APPROVED` must be in the **same transaction**. If either fails, the system is in an inconsistent state. | 🟡 Significant |
+| **G6** | Entity name `ServiceJobEditAppl` is too narrow — you explicitly stated the pattern must cover "any entity, different nesting levels." Rename to `ConfigChangeRequest` or `EntityChangeRequest` now, before adding more entity types creates a proliferation of identical staging tables. | 🟡 Significant |
+
+---
+
+### Key Design Corrections
+
+**Entity name change:**
+> `ServiceJobEditAppl` → **`ConfigChangeRequest`** *(generic, reusable)*
+
+**Missing fields to add:**
+```
+targetEntityName      — "moqui.service.job.ServiceJob"
+targetPrimaryKey      — "approve_rejectedItemsCycleCount_STORE"
+decisionDateTime      — when was the decision made?
+decisionNote          — why was it rejected? (required for rejection notification)
+```
+
+**Rename for clarity:**
+```
+action       → operationType        (e.g. UPDATE_SERVICE_JOB)
+actionType   → reviewScreenPath     (UI routing, optional/derived)
+applicationDateTime + createdDateTime → merge into requestedDateTime
+```
+
+**`applicationData` JSON structure:**
+```json
+{
+  "currentState":  { ...live ServiceJob snapshot at request time... },
+  "proposedState": { ...what the user submitted... }
+}
+```
+
+**For G7 (bypass paths):** Pair the service-layer gate with an **ECA rule** on the `ServiceJob` entity to catch the Tools admin screen path — the only way to close it without modifying the framework screen.
+
+---
+
+The full corrected entity definition and recommended implementation order (6 phases) are in the report artifact.
